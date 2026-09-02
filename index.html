@@ -310,11 +310,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <span class="lcx" onclick="clearLoc()">✕</span>
     </div>
     <div class="mrow">
-      <div class="mfield"><label>Completed By</label><input type="text" id="locby" placeholder="Name / Title"></div>
-      <div class="mfield" style="max-width:130px"><label>Quarter</label>
+      <div class="mfield"><label for="locby">Completed By</label><input type="text" id="locby" placeholder="Name / Title"></div>
+      <div class="mfield" style="max-width:130px"><label for="locqtr">Quarter</label>
         <select id="locqtr"><option>Q1 2026</option><option>Q2 2026</option><option selected>Q3 2026</option><option>Q4 2026</option><option>Q1 2027</option></select>
       </div>
-      <div class="mfield" style="max-width:150px"><label>Date of Audit</label><input type="date" id="locdate"></div>
+      <div class="mfield" style="max-width:150px"><label for="locdate">Date of Audit</label><input type="date" id="locdate"></div>
     </div>
   </div>
   <div class="scard">
@@ -381,13 +381,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <h2>✉️ Send Completed Audit</h2>
     <div class="sub">Always sends to VP of Risk &amp; Safety and SVP Managed Services, plus the Regional VP below — includes score and action items.</div>
     <div class="email-field">
-      <label>Regional VP</label>
+      <label for="rvpSelect">Regional VP</label>
       <select id="rvpSelect" onchange="onRvpSelect()">
         <option value="">— Select Regional VP —</option>
       </select>
     </div>
     <div class="email-field">
-      <label>Regional VP Email <span style="color:#94a3b8;font-weight:400;text-transform:none;letter-spacing:0">(auto-filled — edit if needed)</span></label>
+      <label for="emailRVP">Regional VP Email <span style="color:#94a3b8;font-weight:400;text-transform:none;letter-spacing:0">(auto-filled — edit if needed)</span></label>
       <input type="email" id="emailRVP" placeholder="regional.vp@theservicecompanies.com">
     </div>
     <div class="email-note">
