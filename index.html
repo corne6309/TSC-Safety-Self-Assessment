@@ -410,7 +410,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="help-close" onclick="closeHelpModal()">✕</button>
     </div>
     <div class="help-body">
-      <div id="helpVideoArea" class="help-video">📹 Video walkthrough coming soon — for now, follow the steps below.</div>
+      <div id="helpVideoArea" class="help-video">
+        <video id="helpVideoEl" controls playsinline preload="auto" style="display:none;width:100%;max-height:70vh;border-radius:8px;background:#000"></video>
+        <span id="helpVideoPlaceholder">📹 Video walkthrough coming soon — for now, follow the steps below.</span>
+      </div>
 
       <div class="help-tip" style="background:#dbeafe;border-left-color:#1e3a8a;color:#1e3a8a;font-weight:600">🗓️ <strong>You do NOT have to finish this in one sitting.</strong> You have the entire quarter to complete it. Answer a few questions, tap "💾 Save Now" (or just close the app — it saves automatically), and come back whenever you have time. Nothing is lost.</div>
 
@@ -1340,29 +1343,25 @@ const HELP_VIDEO_FILE='TSC_SelfAssessment_Walkthrough_v2.mp4';
 const HELP_VIDEO_URL='';
 function openHelpModal(){
   const area=document.getElementById('helpVideoArea');
+  const vid=document.getElementById('helpVideoEl');
+  const placeholder=document.getElementById('helpVideoPlaceholder');
   if(HELP_VIDEO_FILE){
-    // Built via createElement + explicit .load() rather than innerHTML — some browsers
-    // don't reliably initialize a dynamically-inserted <video src="..."> without this,
-    // even though the exact same markup works fine if it's in the page from the start.
-    area.innerHTML='';
-    const vid=document.createElement('video');
-    vid.src=HELP_VIDEO_FILE;
-    vid.controls=true;
-    vid.playsInline=true;
-    vid.preload='metadata';
-    vid.style.width='100%';
-    vid.style.maxHeight='70vh';
-    vid.style.borderRadius='8px';
-    vid.style.background='#000';
-    area.appendChild(vid);
-    vid.addEventListener('error',()=>{
-      area.innerHTML='<div style="padding:20px;text-align:center;color:#b91c1c;background:#fef2f2;border-radius:8px">⚠️ Video failed to load. Try tapping 🔄 Refresh, or check with your Risk VP that the video file is correctly uploaded.</div>';
-      area.style.padding='';
-      area.style.background='';
-    });
-    vid.load();
+    if(vid.getAttribute('src')!==HELP_VIDEO_FILE){
+      vid.src=HELP_VIDEO_FILE;
+      vid.load();
+    }
+    vid.style.display='';
+    placeholder.style.display='none';
     area.style.padding='0';
     area.style.background='none';
+    vid.addEventListener('error',()=>{
+      vid.style.display='none';
+      placeholder.textContent='⚠️ Video failed to load. Try tapping 🔄 Refresh, or check with your Risk VP that the video file is correctly uploaded.';
+      placeholder.style.display='';
+      placeholder.style.color='#b91c1c';
+      area.style.padding='';
+      area.style.background='';
+    },{once:true});
   } else if(HELP_VIDEO_URL){
     area.innerHTML='<iframe src="'+HELP_VIDEO_URL+'" style="width:100%;aspect-ratio:16/9;border:none;border-radius:8px" allowfullscreen></iframe>';
     area.style.padding='0';
