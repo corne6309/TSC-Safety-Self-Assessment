@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSC Safety Self-Assessment</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;color:#1e293b;font-size:15px;padding-bottom:38px}
+#topbanner{width:100%;display:block;line-height:0}
+#topbanner img{width:100%;height:auto;display:block}
+#footbanner{position:fixed;bottom:0;left:0;right:0;background:#0a0a0a;color:#d4af37;text-align:center;padding:8px 10px;font-size:11px;font-weight:600;letter-spacing:.04em;z-index:300;border-top:2px solid #d4af37}
+#header{background:#0f172a;color:#fff;padding:12px 14px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+#header-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:880px;margin:0 auto}
+#header-title{flex:1;min-width:140px;display:flex;align-items:center;gap:10px}
+#header-title .accent-bar{width:4px;align-self:stretch;background:linear-gradient(180deg,#f4c430,#d4af37);border-radius:2px;flex-shrink:0}
+#header-title .label{font-size:10.5px;color:#d4af37;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+#header-title .name{font-size:19px;font-weight:800;letter-spacing:-.01em;color:#fff;line-height:1.15;text-shadow:0 1px 3px rgba(0,0,0,.3)}
+#header-btns{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+#progress-wrap{max-width:880px;margin:7px auto 0}
+#progress-text{font-size:11px;color:#64748b;margin-bottom:3px}
+#progress-bar-bg{background:#1e293b;border-radius:4px;height:5px}
+#progress-bar{height:5px;border-radius:4px;background:#3b82f6;transition:width .35s;width:0%}
+.bwarn{background:#7f1d1d;color:#fca5a5;border-radius:7px;padding:4px 9px;font-size:11px;font-weight:600}
+.bwarn2{background:#713f12;color:#fde68a;border-radius:7px;padding:4px 9px;font-size:11px;font-weight:600}
+.pbadge{background:#1e293b;border-radius:7px;padding:4px 10px;font-size:12px;font-weight:700}
+.btn{border:none;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:11px;font-weight:600;color:#fff;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn-blue{background:#3b82f6}.btn-green{background:#059669}.btn-slate{background:#475569}.btn-amber{background:#b45309}.btn-purple{background:#6d28d9}
+
+/* EMAIL MODAL */
+#emailModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:20px}
+#emailModal.open{display:flex}
+.email-box{background:#fff;border-radius:14px;padding:22px;max-width:460px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.email-box h2{font-size:16px;font-weight:700;color:#0f172a;margin-bottom:4px}
+.email-box .sub{font-size:12px;color:#64748b;margin-bottom:16px}
+#helpModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:20px}
+#helpModal.open{display:flex}
+.help-box{background:#fff;border-radius:14px;padding:0;max-width:640px;width:100%;max-height:85vh;box-shadow:0 20px 60px rgba(0,0,0,.3);display:flex;flex-direction:column}
+.help-header{padding:20px 22px 14px;border-bottom:1.5px solid #e2e8f0;display:flex;justify-content:space-between;align-items:flex-start}
+.help-header h2{font-size:17px;font-weight:700;color:#0f172a}
+.help-header .sub{font-size:12.5px;color:#64748b;margin-top:4px}
+.help-close{background:none;border:none;font-size:22px;color:#94a3b8;cursor:pointer;line-height:1;padding:0 0 0 12px}
+.help-body{overflow-y:auto;padding:18px 22px 22px}
+.help-video{background:#f1f5f9;border-radius:10px;padding:20px;text-align:center;color:#64748b;font-size:13px;margin-bottom:18px}
+.help-step{display:flex;gap:12px;margin-bottom:14px}
+.help-step-num{flex:none;width:26px;height:26px;border-radius:50%;background:#1e3a8a;color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.help-step-text{font-size:13px;color:#334155;line-height:1.5}
+.help-step-text strong{color:#0f172a}
+.help-section-title{font-size:13px;font-weight:700;color:#0f172a;margin:20px 0 10px;padding-top:14px;border-top:1px solid #f1f5f9}
+.help-section-title:first-child{margin-top:0;padding-top:0;border-top:none}
+.help-tip{background:#fef9c3;border-left:3px solid #eab308;padding:10px 12px;border-radius:6px;font-size:12.5px;color:#713f12;margin-bottom:10px}
+.email-field{margin-bottom:12px}
+.email-field label{display:block;font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.email-field input{width:100%;border:1.5px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.email-field input:focus{border-color:#3b82f6}
+.email-note{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;font-size:12px;color:#92400e;margin-bottom:16px;line-height:1.5}
+.email-btns{display:flex;gap:8px}
+.email-btns button{flex:1;padding:10px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer}
+.email-btn-cancel{background:#f1f5f9;color:#475569}
+.email-btn-send{background:#6d28d9;color:#fff}
+
+/* SETUP */
+#setup-screen{max-width:600px;margin:28px auto;padding:0 12px 60px}
+.scard{background:#fff;border-radius:14px;padding:20px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.scard h2{font-size:15px;font-weight:700;color:#0f172a;margin-bottom:3px}
+.scard .sub{font-size:12px;color:#64748b;margin-bottom:14px}
+
+#lsw{position:relative}
+#ls{width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px 9px 34px;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+#ls:focus{border-color:#3b82f6}
+#lsi{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+#ldd{position:absolute;top:calc(100% + 3px);left:0;right:0;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:500;max-height:240px;overflow-y:auto;display:none}
+#ldd.open{display:block}
+.lopt{padding:9px 12px;cursor:pointer;border-bottom:1px solid #f1f5f9}
+.lopt:last-child{border-bottom:none}
+.lopt:hover,.lopt.hl{background:#eff6ff}
+.lopt-name{font-size:13px;font-weight:600}
+.lopt-meta{font-size:11px;color:#94a3b8;margin-top:1px}
+.lopt-id{display:inline-block;background:#e2e8f0;color:#475569;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:700;margin-right:5px}
+#lchip{display:none;align-items:center;gap:9px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:9px;padding:8px 12px;margin-top:8px}
+.lcid{background:#1e40af;color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap}
+.lcname{font-size:13px;font-weight:600;color:#1e3a8a}
+.lcmeta{font-size:11px;color:#64748b}
+.lcx{margin-left:auto;cursor:pointer;color:#94a3b8;font-size:18px;font-weight:300;line-height:1}
+.lcx:hover{color:#ef4444}
+
+.mrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.mfield{flex:1;min-width:130px}
+.mfield label{display:block;font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.mfield input,.mfield select{width:100%;border:1.5px solid #e2e8f0;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.mfield input:focus,.mfield select:focus{border-color:#3b82f6}
+
+.stogrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stog{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:10px;border:2px solid #e2e8f0;user-select:none;min-width:0}
+.stog.core{border-color:#c7d2fe;background:#eef2ff;cursor:default}
+.stog.opt{cursor:pointer;transition:border-color .15s,background .15s}
+.stog.opt:hover{border-color:#94a3b8}
+.stog.opt.on{border-color:var(--sc);background:color-mix(in srgb,var(--sc) 10%,white)}
+.sdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.slabel{font-size:13px;font-weight:600;flex:1;line-height:1.3;overflow-wrap:break-word;word-break:break-word;min-width:0}
+.scount{font-size:11px;color:#94a3b8}
+.tsw{width:34px;height:20px;border-radius:10px;background:#e2e8f0;position:relative;transition:background .2s;flex-shrink:0}
+.tsw.on{background:var(--sc,#3b82f6)}
+.tsw::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tsw.on::after{left:17px}
+.core-lock{font-size:9px;color:#6366f1;font-weight:700;background:#e0e7ff;border-radius:4px;padding:2px 5px}
+
+.start-btn{width:100%;padding:13px;font-size:14px;font-weight:700;border:none;border-radius:10px;background:#0f172a;color:#fff;cursor:pointer;transition:background .15s}
+.start-btn:hover:not(:disabled){background:#1e293b}
+.start-btn:disabled{background:#cbd5e1;color:#94a3b8;cursor:not-allowed}
+
+/* AUDIT */
+#audit-screen{display:none;padding:0 8px 60px}
+#hloc{max-width:880px;margin:7px auto 0;display:flex;align-items:center;gap:8px;padding-top:7px;border-top:1px solid #1e293b}
+#hloctext{font-size:12px;color:#94a3b8;flex:1}
+#changebtn{font-size:11px;color:#64748b;background:none;border:none;cursor:pointer;padding:0}
+#changebtn:hover{color:#94a3b8;text-decoration:underline}
+
+#secpanel{background:#fff;border-radius:10px;padding:10px 13px;margin:10px auto;max-width:880px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+#secpanel summary{font-size:12px;font-weight:700;color:#334155;cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:2px 0}
+#secpanel summary::-webkit-details-marker{display:none}
+#secpanel summary::after{content:'▼';font-size:10px;color:#94a3b8;margin-left:auto;transition:transform .2s}
+#secpanel[open] summary::after{transform:rotate(180deg)}
+.smgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:7px;margin-top:10px}
+.smi{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:8px;border:1.5px solid #e2e8f0;font-size:12px;font-weight:600;cursor:pointer;user-select:none;transition:all .15s}
+.smi.core{background:#eef2ff;border-color:#c7d2fe;cursor:default;color:#4338ca}
+.smi.opt.on{border-color:var(--sc);background:color-mix(in srgb,var(--sc) 8%,white);color:var(--sc)}
+.smi.opt{color:#64748b}
+.smidot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
+.smisw{width:26px;height:15px;border-radius:8px;background:#e2e8f0;position:relative;transition:background .2s;margin-left:auto;flex-shrink:0}
+.smi.on .smisw{background:var(--sc,#3b82f6)}
+.smisw::after{content:'';position:absolute;width:9px;height:9px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .15s}
+.smi.on .smisw::after{left:14px}
+
+#filterbar{background:#fff;border-radius:10px;padding:10px 13px;margin:0 auto 10px;max-width:880px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+#si{width:100%;border:1.5px solid #e2e8f0;border-radius:7px;padding:8px 13px;font-size:14px;font-family:inherit;outline:none;margin-bottom:8px;transition:border-color .15s}
+#si:focus{border-color:#3b82f6}
+#fchips,#stchips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px}
+.chip{border:none;border-radius:20px;padding:3px 11px;font-size:11px;font-weight:600;cursor:pointer;background:#f1f5f9;color:#64748b}
+#fcnt{font-size:11px;color:#94a3b8;margin-top:4px}
+.exprow{max-width:880px;margin:0 auto 6px;display:flex;gap:6px;justify-content:flex-end}
+
+#qcon{max-width:880px;margin:0 auto}
+.sh{display:flex;align-items:center;justify-content:space-between;background:#1e293b;color:#fff;border-radius:10px;padding:10px 14px;margin-bottom:5px;cursor:pointer;user-select:none;transition:background .15s}
+.sh:hover{background:#263347}
+.shl{display:flex;align-items:center;gap:9px}
+.shdot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.shtitle{font-size:13px;font-weight:700}
+.shr{display:flex;align-items:center;gap:9px}
+.shchev{font-size:11px;transition:transform .25s;color:#64748b}
+.shchev.open{transform:rotate(180deg)}
+.shmbar{width:52px;height:4px;background:#334155;border-radius:2px;overflow:hidden}
+.shmfill{height:4px;border-radius:2px;transition:width .3s}
+.sbody{overflow:hidden;max-height:0;opacity:0;transition:max-height .3s ease,opacity .25s ease}
+.sbody.open{max-height:99999px;opacity:1}
+
+.qc{background:#fff;border-radius:9px;padding:11px 12px;margin-bottom:7px;border:1.5px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:border-color .15s}
+.qc.warn{border-color:#f97316}
+.qc.ayes{border-left:4px solid #16a34a}
+.qc.ano{border-left:4px solid #dc2626}
+.qc.ana{border-left:4px solid #6b7280}
+.qtop{display:flex;gap:9px;align-items:flex-start}
+.qmeta{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.qq{font-size:14px;font-weight:500;line-height:1.45}
+.qnum{font-size:11px;color:#94a3b8;margin-right:3px}
+.qbody{flex:1}
+.qbtns{display:flex;flex-direction:column;gap:4px;min-width:68px}
+.ab{border-radius:6px;padding:6px 0;cursor:pointer;font-size:12px;font-weight:700;border:1.5px solid #e2e8f0;background:#fff;color:#94a3b8;transition:all .1s;width:100%}
+.ab.sy{background:#dcfce7;border-color:#16a34a;color:#15803d}
+.ab.sn{background:#fee2e2;border-color:#dc2626;color:#b91c1c}
+.ab.sna{background:#f3f4f6;border-color:#6b7280;color:#374151}
+.na{margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9}
+.nl{font-size:11px;font-weight:700;display:block;margin-bottom:3px}
+.nl.r{color:#dc2626}.nl.w{color:#d97706}.nl.g{color:#64748b}
+.nta{width:100%;border:1.5px solid #e2e8f0;border-radius:6px;padding:6px 9px;font-size:13px;font-family:inherit;resize:vertical;outline:none;min-height:52px;transition:border-color .15s}
+.nta.r{border-color:#ef4444}.nta.w{border-color:#f59e0b}
+.nta:focus{border-color:#3b82f6}
+.bdg{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;white-space:nowrap}
+.cr{background:#fee2e2;border:1px solid #ef4444;color:#b91c1c}
+.co{background:#ffedd5;border:1px solid #f97316;color:#c2410c}
+.cy{background:#fefce8;border:1px solid #eab308;color:#92400e}
+
+#sumpane{display:none;max-width:880px;margin:0 auto}
+.sumhero{background:#0f172a;color:#fff;border-radius:12px;padding:18px;margin-bottom:10px}
+.sumscore{font-size:50px;font-weight:800;line-height:1}
+.sumstats{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+.sumstat .v{font-size:28px;font-weight:700;line-height:1}
+.sumstat .l{font-size:11px;color:#64748b}
+.sumcard{background:#fff;border-radius:10px;padding:14px;margin-bottom:9px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.sumcard h3{font-size:13px;font-weight:700;margin-bottom:11px;color:#334155}
+.srow{margin-bottom:9px}
+.srowtop{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.sbar{background:#f1f5f9;border-radius:4px;height:7px;overflow:hidden}
+.sbarfill{height:7px;border-radius:4px;transition:width .4s}
+.iss{border-left:3px solid #e2e8f0;padding-left:9px;margin-bottom:11px}
+.issmeta{font-size:11px;color:#94a3b8;margin-bottom:2px}
+.issq{font-size:13px;font-weight:500}
+.issnote{font-size:12px;color:#64748b;font-style:italic;margin-top:2px}
+.qc.locked{opacity:.75}
+.ab:disabled{cursor:not-allowed;opacity:.6}
+.nta:disabled{background:#f8fafc;color:#64748b;cursor:not-allowed}
+#finalizedBanner{display:none;background:#1e3a8a;color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:13px;font-weight:700;text-align:center;max-width:880px;margin-left:auto;margin-right:auto}
+
+/* ACTION LIST */
+#actionListPane{display:none;max-width:880px;margin:0 auto}
+.al-item{background:#fff;border-radius:10px;padding:14px;margin-bottom:9px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-left:4px solid #dc2626}
+.al-item.status-progress{border-left-color:#d97706}
+.al-item.status-resolved{border-left-color:#15803d}
+.sla-badge{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:3px 10px}
+.sla-badge.sla-ontrack{background:#dcfce7;color:#15803d}
+.sla-badge.sla-soon{background:#fef3c7;color:#92400e}
+.sla-badge.sla-overdue{background:#fee2e2;color:#b91c1c}
+.sla-badge.sla-done{background:#e0e7ff;color:#3730a3}
+.al-meta{font-size:11px;color:#94a3b8;margin-bottom:3px}
+.al-q{font-size:13px;font-weight:600;margin-bottom:4px}
+.al-note{font-size:12px;color:#64748b;font-style:italic;margin-bottom:8px}
+.al-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.al-controls select{border:1.5px solid #e2e8f0;border-radius:6px;padding:5px 9px;font-size:12px;font-family:inherit;outline:none}
+.al-controls input{flex:1;min-width:150px;border:1.5px solid #e2e8f0;border-radius:6px;padding:5px 9px;font-size:12px;font-family:inherit;outline:none}
+
+.qc-collapsed{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;opacity:.88}
+.qc-collapsed:hover{opacity:1;border-color:#cbd5e1}
+.qc-collapsed-text{flex:1;font-size:12.5px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.qc-collapsed-chevron{color:#cbd5e1;font-size:11px;flex-shrink:0}
+.qc-collapse-btn{display:block;margin:10px auto 0;background:none;border:none;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;padding:6px 12px}
+.qc-collapse-btn:hover{color:#475569}
+@media print{
+  body *{display:none !important}
+  #printRedirectMsg, #printRedirectMsg *{display:block !important}
+  #printRedirectMsg{font-family:-apple-system,sans-serif;padding:60px 40px;text-align:center}
+  #printRedirectMsg h1{font-size:22px;color:#0f172a;margin-bottom:16px}
+  #printRedirectMsg p{font-size:15px;color:#334155;line-height:1.6;max-width:480px;margin:0 auto 12px}
+  #printRedirectMsg .highlight{background:#fef3c7;border-radius:8px;padding:14px 18px;font-weight:700;color:#92400e;margin-top:10px}
+}
+</style>
+</head>
+<body>
+<div id="printRedirectMsg" style="display:none">
+  <h1>⚠️ Please don't print or save this page as a PDF</h1>
+  <p>A printed or PDF version of this page cannot be read by the tracking system — your results won't be received.</p>
+  <p>Please close this print dialog and use the actual export button in the app instead:</p>
+  <div class="highlight">⬇ Excel (not Print/PDF)</div>
+  <p style="margin-top:20px">That button is near the top of the audit screen once you're finished answering questions.</p>
+</div>
+
+<div id="topbanner"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QKyRXhpZgAATU0AKgAAAAgAAodpAAQAAAABAAABMuocAAcAAAEMAAAAJgAAAAAc6gAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWQAwACAAAAFAAAAoCQBAACAAAAFAAAApSSkQACAAAAAzAwAACSkgACAAAAAzAwAADqHAAHAAABDAAAAXQAAAAAHOoAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADIwMjY6MDU6MDcgMTI6NTA6NDkAMjAyNjowNTowNyAxMjo1MDo0OQAAAP/hAqxodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvADw/eHBhY2tldCBiZWdpbj0n77u/JyBpZD0nVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkJz8+DQo8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIj48cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPjxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSJ1dWlkOmZhZjViZGQ1LWJhM2QtMTFkYS1hZDMxLWQzM2Q3NTE4MmYxYiIgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iPjxleGlmOkRhdGVUaW1lT3JpZ2luYWw+MjAyNi0wNS0wN1QxMjo1MDo0OTwvZXhpZjpEYXRlVGltZU9yaWdpbmFsPjwvcmRmOkRlc2NyaXB0aW9uPjwvcmRmOlJERj48L3g6eG1wbWV0YT4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8P3hwYWNrZXQgZW5kPSd3Jz8+/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU/8AAEQgAiAYvAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A+DJrSGf78YJ9RwaozaIDzE+PZq1KKAOdm0+eD7yEj1HNViMV1dQzWkM/34wT6jg0Ac1RWtNogPMT49mqjNp88HLISPUcigCvRRjFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRTWdUHJxQA6ioHu1H3RuqF7l26HaPagC4zBepAqF7tV6ZaqhJPU5pKAJnunbp8o9qiJJOSc0lFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFfVX/BOv8A5K74g/7Acn/pRBXyrX1V/wAE6/8AkrviD/sByf8ApRBXyPF3/IixX+H9Uerlf++0vU/Qmiiiv5AP1Y/Iqiiiv7tPxQKKKKACiiigCGazhn+/GCfUcGqE2iA8xSY9mrVooA5yawng5ZCR6jkVXrq6gmsoZ/vxjPqODQBzdFa02iDkxP8Ag1UZrGeD70Zx6jkUAV6K91/Z5/ZL8UfHO7jvZFbRPCyNiXVJ0OZPVYl43n36DuegP1H8XP8Agnt4X1fwnbL4Ed9I12yh2/6XK0kd8R/z0J+659VAHsOtfM4ziPLsDiY4arP3nvbVR9f606nZTwlWpDnitPzPznord8aeB9c+HviC50XxDp02majbsVeKUdeeqnoynsRwawq+jhONSKnB3T6o5GmnZhRRRViCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooprOq9SBQA6ioHu1H3RuqBrl274HtQBcZ1QckConu1H3RmqhJJ5OaSgCV7l274HtUZJJyeaSigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACvqr/AIJ1/wDJXfEH/YDk/wDSiCvlWvqr/gnX/wAld8Qf9gOT/wBKIK+R4u/5EWK/w/qj1cr/AN9pep+hNFFFfyAfqx+RVFFFf3afigUUUUAFFFFABRRRQAUUVr+GPCGt+M9RWw0LSrvVrtv+WVpE0jAepx0FRKcYRcpuyQ0m3ZGdZ2c+o3UVrawyXFxKwSOKJSzOxOAAB1NfaH7PX7EAjFt4h+IseMbZYNDzjHcGc/8Asg/H0qp8Df2YPil4SjF/bx6F4V1GUf8AIRv0+13sSnP+qUZROOueevPauV/avu/FPwv1PSNFl+Jmu69q93A11eBG+yRRxltqDZG3OSH69gPWvhMdmVTNa/8AZ+XYiMb3u1dvTezSsl53v6HpU6Kox9rVi2ffts2n6Zaw2tu1ta28KiOOGMqioo4AAHAAp41OzJwLuAn2kH+NfjXd65qN++661C6uWzndNMzHP4mqsc8kL7o5HRs53KxBrw1wHfWWJ1/w/wD2x0/2n2h+P/AP1l+LnwY8IfHLw+2m6/axTTKp+zah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2q5wGx784I+T5ZXnleSRi8jsWZmOSSepNdRVaawgn+8gB9V4oA52itSbRCOYpM+zVRms5oD88ZA9R0oAhooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKY8qJ1YUAPoqs95/dH4moXnd+px7CgC48qJ1aoXvMfdGfrVWigCR53fqcD2qOiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACvqr/AIJ1/wDJXfEH/YDk/wDSiCvlWvqr/gnX/wAld8Qf9gOT/wBKIK+R4u/5EWK/w/qj1cr/AN9pep+hNFFFfyAfqx+RVFFFf3afigUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAFabT4J/vIAfVeKozaIw5icH2ateigDmprOaD78ZA9e1Q11XWq82nwT/eQA+q8UAc7RWpNojDmJwfZqozWc0H34yB69qAIaKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiimPMidTQA+iqr3n90fnULzO/U8elAF1pkTq1Qvef3V/E1VooAkeZ36t+AqOiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACvqr/gnX/yV3xB/2A5P/SiCvlWvqr/gnX/yV3xB/wBgOT/0ogr5Hi7/AJEWK/w/qj1cr/32l6n6E0UUV/IB+rH5FUUUV/dp+KBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUmM0tFAFabT4J+qAH1XiqM2iMMmJwfZq16KAOamtJoPvxkD17VDXVnmq02nQTdU2n1XigDnaK05tEYZMThh6NxVGa0lg++hA9e1AEVFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRUbTonVvyoAkoqq95/dX8TULTO/VjQBdeZE6n8Kge8/ur+JqtRQA9pnfqxplFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFfVX/BOv8A5K74g/7Acn/pRBXyrX1V/wAE6/8AkrviD/sByf8ApRBXyPF3/IixX+H9Uerlf++0vU/Qmiiiv5AP1Y/Iqiiiv7tPxQKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACkIzRRQBWm06CbOU2n1XiqM2iMOY3DezUUUAUZbWWD76Ee/aoqKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigCN50Tq35VC94f4Rj60UUAQvKz9SfpTKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAK+qv8AgnX/AMld8Qf9gOT/ANKIKKK+R4u/5EWK/wAP6o9XK/8AfaXqfoTRRRX8gH6sf//Z" alt="The Service Companies"></div>
+
+<div id="header">
+  <div id="header-top">
+    <div id="header-title">
+      <div class="accent-bar"></div>
+      <div>
+        <div class="label">TSC Safety Audit</div>
+        <div class="name">Self-Assessment</div>
+      </div>
+    </div>
+    <div id="header-btns">
+      <div id="statusRow" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;width:100%;margin-bottom:8px">
+        <span id="netStatusBadge" style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:10px;white-space:nowrap"></span>
+        <button class="btn btn-slate" onclick="openHelpModal()" style="background:#0e7490">❓ How to Use</button>
+        <button class="btn btn-slate" onclick="forceRefresh()" title="Tap this if the app seems stuck, out of date, or isn't behaving right — it's safe, your progress is already saved">🔄 Refresh</button>
+        <span class="pbadge" id="pbadge" style="color:#f59e0b;display:none">0/0</span>
+        <span id="saveIndicator" style="font-size:11px;font-weight:700;color:#4ade80;opacity:0;transition:opacity .3s;white-space:nowrap">✓ Saved</span>
+        <span id="nowarn" class="bwarn" style="display:none"></span>
+        <span id="nawarn" class="bwarn2" style="display:none"></span>
+      </div>
+      <div id="actionRow" style="display:flex;flex-wrap:wrap;gap:8px;width:100%">
+        <button class="btn btn-slate" id="savebtn" onclick="manualSave()" style="display:none">💾 Save Now</button>
+        <button class="btn btn-blue" id="sumbtn" onclick="toggleSum()" style="display:none">📊 Summary</button>
+        <button class="btn" style="background:#0e7490;display:none" id="albtn" onclick="toggleActionList()">📋 Action List</button>
+        <button class="btn" style="background:#1e3a8a;display:none" id="finalizebtn" onclick="requestFinalize()">✅ Finalize</button>
+        <button class="btn btn-green" id="expbtn" onclick="doExport()" style="display:none" title="Tap this button to send your results — do not use your browser's Print or Save as PDF option, it cannot be read by the tracking system">⬇ Excel (No PDF)</button>
+        <button class="btn btn-purple" id="emailbtn" onclick="openEmailModal()" style="display:none">✉️ Send Audit</button>
+      </div>
+      <div id="dangerRow" style="display:flex;width:100%;margin-top:4px">
+        <button class="btn btn-amber" id="newbtn" onclick="requestNewAudit()" style="display:none">🔄 New Audit</button>
+      </div>
+    </div>
+  </div>
+  <div id="hloc" style="display:none">
+    <div id="hloctext"></div>
+    <button id="changebtn" onclick="backToSetup()">✏️ Change setup</button>
+  </div>
+  <div id="progress-wrap" style="display:none">
+    <div id="progress-text" style="font-size:11px;color:#64748b;margin-bottom:3px"></div>
+    <div id="progress-bar-bg"><div id="progress-bar"></div></div>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div id="setup-screen">
+  <div id="storageWarning" style="display:none;background:#7f1d1d;border:2px solid #dc2626;border-radius:12px;padding:14px 16px;margin-bottom:12px">
+    <div style="font-size:14px;font-weight:800;color:#fecaca;margin-bottom:4px">⚠️ This browser is not saving your progress</div>
+    <div style="font-size:12.5px;color:#fecaca;line-height:1.5">Your answers only exist in memory right now and will be <strong>lost</strong> if you close this app or the page reloads. Export to Excel often to keep a safe copy, or try opening this in Safari (iPhone/iPad) or Chrome (Android/desktop) instead.</div>
+  </div>
+  <div class="scard">
+    <h2>📍 Location &amp; Audit Info</h2>
+    <div class="sub">Select your location — sections are pre-loaded from the hierarchy file.</div>
+    <div id="lsw">
+      <span id="lsi">🏨</span>
+      <input type="text" id="ls" placeholder="Search by location name or Unit ID…"
+        autocomplete="off" oninput="filterLocs()" onfocus="openDD()" onkeydown="handleKey(event)">
+      <div id="ldd"></div>
+    </div>
+    <div id="lchip">
+      <span class="lcid" id="lcid"></span>
+      <div><div class="lcname" id="lcname"></div><div class="lcmeta" id="lcmeta"></div></div>
+      <button id="deleteSavedBtn" onclick="requestDeleteSaved()" style="display:none;border:none;background:#fee2e2;color:#b91c1c;font-size:11px;font-weight:700;padding:5px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;margin-right:6px">🗑️ Delete Saved</button>
+      <span class="lcx" onclick="clearLoc()">✕</span>
+    </div>
+    <div class="mrow">
+      <div class="mfield"><label for="locby">Completed By</label><input type="text" id="locby" placeholder="Name / Title"></div>
+      <div class="mfield" style="max-width:130px"><label for="locqtr">Quarter</label>
+        <select id="locqtr"><option>Q1 2026</option><option>Q2 2026</option><option selected>Q3 2026</option><option>Q4 2026</option><option>Q1 2027</option></select>
+      </div>
+      <div class="mfield" style="max-width:150px"><label for="locdate">Date of Audit</label><input type="date" id="locdate"></div>
+    </div>
+  </div>
+  <div class="scard">
+    <h2>📋 Audit Sections</h2>
+    <div class="sub">Core sections always included. Optional sections pre-set from your location data — toggle to adjust.</div>
+    <div class="stogrid" id="stogrid"></div>
+  </div>
+  <div class="scard" style="padding:0;overflow:hidden">
+    <button class="start-btn" id="startbtn" onclick="startAudit()" disabled>Select a location to begin →</button>
+  </div>
+</div>
+
+<!-- AUDIT -->
+<div id="audit-screen">
+  <div id="finalizedBanner" style="display:none"></div>
+  <div style="max-width:880px;margin:0 auto 10px;text-align:center">
+    <button id="unlockbtn" style="display:none;background:#64748b;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer">🔓 Unlock to Fix a Mistake</button>
+  </div>
+  <div id="unlockConfirmBar" style="display:none;max-width:880px;margin:0 auto 10px;background:#fef9e7;border:1.5px solid #d97706;border-radius:10px;padding:12px 16px">
+    <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:8px">⚠️ Unlock this audit to fix a mistake? Answers become editable again — remember to tap Finalize when you're done.</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-slate" onclick="cancelUnlock()">Cancel</button>
+      <button class="btn" style="background:#d97706" onclick="confirmUnlock()">Yes, Unlock</button>
+    </div>
+  </div>
+  <div id="finalizeConfirmBar" style="display:none;max-width:880px;margin:0 auto 12px;background:#fef2f2;border:1.5px solid #dc2626;border-radius:10px;padding:12px 16px">
+    <div style="font-size:13px;font-weight:700;color:#991b1b;margin-bottom:8px">⚠️ Finalize this audit? Answers cannot be edited afterward — only the Action List will stay editable.</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-slate" onclick="cancelFinalize()">Cancel</button>
+      <button class="btn" style="background:#dc2626" onclick="confirmFinalize()">Yes, Finalize</button>
+    </div>
+  </div>
+
+  <details id="secpanel" style="max-width:880px;margin:10px auto;background:#fff;border-radius:10px;padding:10px 13px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+    <summary>⚙️ Active Sections <span id="secpanelcount" style="color:#64748b;font-weight:400;font-size:11px"></span></summary>
+    <div class="smgrid" id="smgrid"></div>
+  </details>
+  <div id="filterbar">
+    <input type="text" id="si" placeholder="🔍  Search questions, ref IDs, or sections…" oninput="render()">
+    <div id="fchips"></div>
+    <div id="stchips"></div>
+    <div id="fcnt"></div>
+  </div>
+  <div class="exprow">
+    <button class="btn btn-slate" onclick="expandAll()">Expand All</button>
+    <button class="btn btn-slate" onclick="collapseAll()">Collapse All</button>
+  </div>
+  <div id="formpane">
+    <div id="qcon"></div>
+  </div>
+  <div id="sumpane">
+    <div class="sumhero" id="sumhero"></div>
+    <div class="sumcard" id="sumsecs"></div>
+    <div class="sumcard" id="sumiss" style="display:none"></div>
+  </div>
+  <div id="actionListPane"></div>
+</div>
+
+<div id="footbanner">TSC PROPRIETARY AND CONFIDENTIAL — INTERNAL USE ONLY</div>
+
+<!-- EMAIL MODAL -->
+<div id="emailModal">
+  <div class="email-box">
+    <h2>✉️ Send Completed Audit</h2>
+    <div class="sub">Always sends to VP of Risk &amp; Safety and SVP Managed Services, plus the Regional VP below — includes score and action items.</div>
+    <div class="email-field">
+      <label for="rvpSelect">Regional VP</label>
+      <select id="rvpSelect" onchange="onRvpSelect()">
+        <option value="">— Select Regional VP —</option>
+      </select>
+    </div>
+    <div class="email-field">
+      <label for="emailRVP">Regional VP Email <span style="color:#94a3b8;font-weight:400;text-transform:none;letter-spacing:0">(auto-filled — edit if needed)</span></label>
+      <input type="email" id="emailRVP" placeholder="regional.vp@theservicecompanies.com">
+    </div>
+    <div class="email-note">
+      📎 Attach your exported Excel file to this email before sending — the VP of Risk &amp; Safety will upload it directly for tracking.
+    </div>
+    <div class="email-btns">
+      <button class="email-btn-cancel" onclick="closeEmailModal()">Cancel</button>
+      <button class="email-btn-send" onclick="sendEmail()">Open Email →</button>
+    </div>
+  </div>
+</div>
+
+<div id="helpModal">
+  <div class="help-box">
+    <div class="help-header">
+      <div>
+        <h2>❓ How to Use This Tool</h2>
+        <div class="sub">A quick walkthrough before you start your first Self-Assessment.</div>
+      </div>
+      <button class="help-close" onclick="closeHelpModal()">✕</button>
+    </div>
+    <div class="help-body">
+      <div id="helpVideoArea" class="help-video">📹 Video walkthrough coming soon — for now, follow the steps below.</div>
+
+      <div class="help-tip" style="background:#dbeafe;border-left-color:#1e3a8a;color:#1e3a8a;font-weight:600">🗓️ <strong>You do NOT have to finish this in one sitting.</strong> You have the entire quarter to complete it. Answer a few questions, tap "💾 Save Now" (or just close the app — it saves automatically), and come back whenever you have time. Nothing is lost.</div>
+
+      <div class="help-section-title">🔘 What Each Button Does, In Order</div>
+      <div class="help-step"><div class="help-step-num">💾</div><div class="help-step-text"><strong>Save Now</strong> — saves your progress right now. You don't need this often (it auto-saves as you go), but it's there for peace of mind.</div></div>
+      <div class="help-step"><div class="help-step-num">📊</div><div class="help-step-text"><strong>Summary</strong> — shows your current score and a list of everything you've flagged so far. Check this any time.</div></div>
+      <div class="help-step"><div class="help-step-num">📋</div><div class="help-step-text"><strong>Action List</strong> — every NO you've answered, in one place, with a status you can update (Open / In Progress / Resolved) as you work through the quarter — even weeks after you finish the assessment itself.</div></div>
+      <div class="help-step"><div class="help-step-num">✅</div><div class="help-step-text"><strong>Finalize</strong> — only tap this once you've answered every question and are truly done. It locks your answers in. (You can still unlock it later if you made a mistake.)</div></div>
+      <div class="help-step"><div class="help-step-num">⬇</div><div class="help-step-text"><strong>Excel (not Print/PDF)</strong> — tap this after finalizing to download your results as a file. This step comes before Send Audit.</div></div>
+      <div class="help-step"><div class="help-step-num">✉️</div><div class="help-step-text"><strong>Send Audit</strong> — tap this last. It opens an email pre-filled with the right recipients — just attach the file you just downloaded and hit send.</div></div>
+      <div class="help-step"><div class="help-step-num">🔄</div><div class="help-step-text"><strong>New Audit</strong> — this is also how you delete/reset the current audit. Use it for starting a genuinely new assessment (like next quarter), or to wipe a mistake and start completely over. Don't tap this if you're just taking a break — your progress is already saved automatically.</div></div>
+
+      <div class="help-section-title">📋 The Full Process, Step by Step</div>
+      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text"><strong>Pick your location.</strong> Tap the search box on the first screen and type your location's name — select it from the list that appears.</div></div>
+      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>Enter your name and today's date.</strong> The quarter fills in on its own — no need to figure that out yourself.</div></div>
+      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>Check your sections are right.</strong> Most sections are already turned on for you. If your location has vehicles or golf carts, make sure those are switched on too.</div></div>
+      <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>Go through each question, whenever you have time.</strong> Tap YES, NO, or N/A for every item. If you tap NO, add a short note about what's wrong. If you tap N/A, add a short reason why it doesn't apply. Stop and come back as many times as you need.</div></div>
+      <div class="help-step"><div class="help-step-num">5</div><div class="help-step-text"><strong>Check your Action List as you go.</strong> Update item statuses throughout the quarter as things get fixed — this doesn't require finishing the assessment first.</div></div>
+      <div class="help-step"><div class="help-step-num">6</div><div class="help-step-text"><strong>Tap Finalize once every question is answered.</strong> Made a mistake after finalizing? Tap "Unlock to Fix a Mistake" — you can always go back in.</div></div>
+      <div class="help-step"><div class="help-step-num">7</div><div class="help-step-text"><strong>Tap Excel, then Send Audit.</strong> Attach the downloaded file to the email that opens, and hit send.</div></div>
+
+      <div class="help-section-title">💡 A Few Extra Tips</div>
+      <div class="help-tip">💡 <strong>Never use your browser's Print or Save as PDF button.</strong> Always use the green Excel button — that's the only format that can be tracked properly.</div>
+      <div class="help-tip">💡 Your progress saves automatically as you go. It's safe to close the app and come back later — you'll pick up right where you left off.</div>
+      <div class="help-tip">📱 <strong>iPhone users:</strong> the Send Audit button may open Apple's built-in Mail app instead of Outlook. To fix this permanently: go to your iPhone's <strong>Settings → Outlook → Default Mail App</strong> and select Outlook. This is a one-time fix for your whole phone, not just this app.</div>
+
+      <div class="help-section-title">🗑️ Need to Delete or Reset an Audit?</div>
+      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text">If you're already inside the audit, tap the orange <strong>"🔄 New Audit"</strong> button. If you're on the setup screen with a saved audit showing, tap <strong>"🗑️ Delete Saved"</strong> right next to your location name instead — same result, either way.</div></div>
+      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text">The button changes to <strong>"⚠️ Tap again — [X] lost"</strong>, showing exactly how many answers will be deleted. This is your warning — tap anything else to cancel, or wait a few seconds and it resets on its own.</div></div>
+      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text">Tap the same button again to confirm. Every answer, note, and Action List entry for the current audit is cleared.</div></div>
+      <div class="help-tip">⚠️ This cannot be undone. If you might need what you've entered, tap Excel to save a copy first before deleting.</div>
+
+      <div class="help-section-title">🔄 App Acting Strange or Out of Date?</div>
+      <div class="help-step-text" style="margin-bottom:8px">Tap the <strong>"🔄 Refresh"</strong> button near the top of the screen. This is safe — your progress is saved automatically before it refreshes, so you won't lose anything. Use this any time something looks wrong, missing, or like an older version of the app.</div>
+
+      <div class="help-section-title">📝 No internet or having trouble with the app?</div>
+      <div class="help-step-text" style="margin-bottom:8px">There's a paper-free backup option: a fillable Excel version of this same audit. Ask your Risk VP for the file — pick your location from the dropdown at the top and everything else works the same way, just typed in directly instead of tapped.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [{"num": 1, "ref": "GS-01", "question": "Walking surfaces clean, dry, free from slip/trip hazards", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "All Shifts", "section": "General Safety"}, {"num": 2, "ref": "GS-02", "question": "Wet floor signs available and used", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "All Shifts", "section": "General Safety"}, {"num": 3, "ref": "GS-03", "question": "Aisles/corridors clear of obstructions", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "General Safety"}, {"num": 4, "ref": "GS-04", "question": "PPE available, accessible, AND being worn by employees for assigned tasks", "criticality": "🔴 CRITICAL — Top 10 #9", "shift": "All Shifts", "section": "General Safety"}, {"num": 5, "ref": "GS-05", "question": "No frayed/damaged electrical cords; damaged cords have replacement ordered and logged in Redbook", "criticality": "🔴 CRITICAL — Fire/Shock", "shift": "All Shifts", "section": "General Safety"}, {"num": 6, "ref": "GS-06", "question": "Electrical panels 36\" clearance", "criticality": "🟠 HIGH — Citation Risk", "shift": "All Shifts", "section": "General Safety"}, {"num": 7, "ref": "GS-07", "question": "Extension cords not permanent wiring", "criticality": "🟠 HIGH — Citation Risk", "shift": "All Shifts", "section": "General Safety"}, {"num": 8, "ref": "GS-08", "question": "BBP exposure control plan in place AND employees trained on BBP procedures", "criticality": "🔴 CRITICAL — Service Industry", "shift": "All Shifts", "section": "General Safety"}, {"num": 9, "ref": "GS-09", "question": "Closed-toe non-slip footwear worn", "criticality": "🔴 CRITICAL — Observable", "shift": "All Shifts", "section": "General Safety"}, {"num": 10, "ref": "GS-10", "question": "Storage organized, heavy items low", "criticality": "🟠 HIGH — Walk-Through", "shift": "All Shifts", "section": "General Safety"}, {"num": 11, "ref": "GS-11", "question": "Biohazard supplies stocked (red bags, sharps, BBP kits)", "criticality": "🔴 CRITICAL — BBP Compliance", "shift": "All Shifts", "section": "General Safety"}, {"num": 12, "ref": "GS-12", "question": "PPE hazard assessment documented", "criticality": "🟠 HIGH — Documentation", "shift": "All Shifts", "section": "General Safety"}, {"num": 13, "ref": "GS-13", "question": "Proper signage displayed (safety signs, no smoking)", "criticality": "🟡 MEDIUM — Visual Check", "shift": "All Shifts", "section": "General Safety"}, {"num": 14, "ref": "GS-14", "question": "Cart doorway security positioning", "criticality": "🟡 MEDIUM — Security", "shift": "Day Shift", "section": "General Safety"}, {"num": 15, "ref": "GS-15", "question": "Back safety/lifting techniques observed (ergonomics)", "criticality": "🟠 HIGH — Injury Prevention", "shift": "All Shifts", "section": "General Safety"}, {"num": 16, "ref": "GS-16", "question": "Labels on shelves with contents", "criticality": "🟠 HIGH — Organization", "shift": "All Shifts", "section": "General Safety"}, {"num": 17, "ref": "GS-17", "question": "Level floor hazards identified and marked", "criticality": "🟠 HIGH — Walk-Through", "shift": "All Shifts", "section": "General Safety"}, {"num": 18, "ref": "GS-18", "question": "Safety posters displayed and current", "criticality": "🟠 HIGH — Compliance", "shift": "All Shifts", "section": "General Safety"}, {"num": 19, "ref": "CS-01", "question": "SDS available for ALL chemicals on-site AND binder accessible to all employees", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 20, "ref": "CS-02", "question": "Chemical containers have original labels", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 21, "ref": "CS-03", "question": "Secondary containers labeled with GHS", "criticality": "🔴 CRITICAL — Common Violation", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 22, "ref": "CS-04", "question": "Chemicals stored in ventilated areas", "criticality": "🟠 HIGH — Storage", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 23, "ref": "CS-05", "question": "Eye wash within 10 sec of chemical areas", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 24, "ref": "CS-06", "question": "Flammable chemicals in approved cabinet (if applicable)", "criticality": "🔴 CRITICAL — Fire/Explosion", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 25, "ref": "CS-07", "question": "Nitrile gloves (not vinyl) for cleaning", "criticality": "🟠 HIGH — Observation", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 26, "ref": "CS-08", "question": "Chemical PPE at point of use Goggles/Apron/Mask/Gloves", "criticality": "🟠 HIGH — Accessibility", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 27, "ref": "CS-09", "question": "Written HazCom Program in place", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 28, "ref": "CS-10", "question": "Chemical-resistant gloves available", "criticality": "🟠 HIGH — PPE", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 29, "ref": "CS-11", "question": "Chemical safety training", "criticality": "🟠 HIGH — Training", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 30, "ref": "CS-12", "question": "Full PPE at chemical dispensing stations", "criticality": "🔴 CRITICAL — Full PPE", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 31, "ref": "CS-13", "question": "Pigmats at chemical storage/dispensing", "criticality": "🟠 HIGH — Spill Prevention", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 32, "ref": "CS-14", "question": "Eye wash weekly inspection checklist", "criticality": "🔴 CRITICAL — Maintenance", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 33, "ref": "EP-01", "question": "Written EAP in place (TSC own, independent of client) and current", "criticality": "🔴 CRITICAL — Required", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 34, "ref": "EP-02", "question": "EAP includes evac routes/assembly points", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 35, "ref": "EP-03", "question": "Emergency contacts posted", "criticality": "🟠 HIGH — Posting", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 36, "ref": "EP-04", "question": "Exit routes marked with illuminated EXIT signs, unobstructed and well-lit", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 37, "ref": "EP-05", "question": "Exit doors unlocked from inside", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 38, "ref": "EP-06", "question": "First aid kits stocked, accessible at all work areas, with accident report packages included", "criticality": "🟠 HIGH — Walk-Through", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 39, "ref": "EP-07", "question": "Emergency procedures communicated to employees", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 40, "ref": "EP-08", "question": "Client coordination docs on file", "criticality": "🟠 HIGH — Documentation", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 41, "ref": "EP-09", "question": "Fire prevention plan documented", "criticality": "🔴 CRITICAL — Required", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 42, "ref": "EP-10", "question": "Fire extinguishers properly mounted, unobstructed, with current monthly inspection tags", "criticality": "🔴 CRITICAL — Top Citation", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 43, "ref": "EP-11", "question": "Employees trained on extinguisher use", "criticality": "🟠 HIGH — Annual Req", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 44, "ref": "EP-12", "question": "Evacuation drills conducted annually", "criticality": "🟠 HIGH — Annual Req", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 45, "ref": "EP-13", "question": "Employees know how to report emergencies", "criticality": "🟠 HIGH — Knowledge", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 46, "ref": "TD-01", "question": "Pre Shift Safety orientation", "criticality": "🔴 CRITICAL — Day 1", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 47, "ref": "TD-02", "question": "Orientation: hazcom, PPE, emergency procedures", "criticality": "🔴 CRITICAL — Content", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 48, "ref": "TD-03", "question": "Orientation records signed and filed", "criticality": "🟠 HIGH — Documentation", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 49, "ref": "TD-04", "question": "HazCom training annually", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 50, "ref": "TD-05", "question": "BBP training annually", "criticality": "🔴 CRITICAL — Annual", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 51, "ref": "TD-06", "question": "Training records with dates/signatures", "criticality": "🟠 HIGH — Documentation", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 52, "ref": "TD-07", "question": "OSHA poster displayed in employee area", "criticality": "🔴 CRITICAL — Required", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 53, "ref": "TD-08", "question": "Incident reporting procedures documented (Redbook)", "criticality": "🔴 CRITICAL — Recordkeeping", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 54, "ref": "TD-09", "question": "Employees know how to report injuries", "criticality": "🟠 HIGH — Knowledge", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 55, "ref": "TD-10", "question": "OSHA 300 log maintained (>10 employees)", "criticality": "🔴 CRITICAL — Legal Req", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 56, "ref": "TD-11", "question": "Pre-shift safety briefings documented with consistent, rotating topics", "criticality": "🟠 HIGH — Observable", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 57, "ref": "TD-12", "question": "Handbook acknowledgment on file", "criticality": "🟡 MEDIUM — Admin", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 58, "ref": "TD-13", "question": "Annual safety refresher conducted", "criticality": "🟠 HIGH — Annual", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 59, "ref": "TD-14", "question": "Training records retained per OSHA", "criticality": "🟠 HIGH — Retention", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 60, "ref": "TD-15", "question": "Discuss Claims GB: Review claims with team", "criticality": "🟠 HIGH — Risk Awareness", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 61, "ref": "TD-16", "question": "Safety documentation organized, all required forms available and current", "criticality": "🟡 MEDIUM — Organization", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 62, "ref": "VH-01", "question": "Valid driver's licenses on file (Online People MVR)", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 63, "ref": "VH-02", "question": "MVR consent forms signed", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 64, "ref": "VH-03", "question": "Driver authorization form completed", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 65, "ref": "VH-04", "question": "Vehicle Use Agreement signed", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 66, "ref": "VH-05", "question": "Bad MVR drivers reassigned/removed", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 67, "ref": "VH-06", "question": "Pre-trip inspections daily/each shift", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 68, "ref": "VH-07", "question": "Inspection: seats, belts, lights, mirrors, emergency equip", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 69, "ref": "VH-08", "question": "Defects reported to Supervisor/HR immediately", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 70, "ref": "VH-09", "question": "Unsafe vehicles out of service until repaired", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 71, "ref": "VH-10", "question": "Maintenance per manufacturer intervals", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 72, "ref": "VH-11", "question": "Maintenance records signed/dated in file", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 73, "ref": "VH-12", "question": "Seat belts worn at all times", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 74, "ref": "VH-13", "question": "No cell phone use while driving", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 75, "ref": "VH-14", "question": "No smoking/eating in vehicles", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 76, "ref": "VH-15", "question": "Incident report packet in glove box", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 77, "ref": "VH-16", "question": "Vehicle accidents reported within 30 min AND escalated to Risk Manager", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 78, "ref": "VH-17", "question": "Post-incident drug test within 8 hrs", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 79, "ref": "VH-18", "question": "Personal vehicle use approved by HR", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 80, "ref": "VH-19", "question": "Insurance proof on file and current; uninsured drivers removed from driving duties", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 81, "ref": "VH-20", "question": "High-point drivers (5-8 pts) enrolled in improvement course within 60 days, certificates on file", "criticality": "🟡 MEDIUM", "shift": "All Shifts", "section": "Vehicles"}, {"num": 82, "ref": "VH-21", "question": "Monthly inspection reports submitted", "criticality": "🟡 MEDIUM", "shift": "All Shifts", "section": "Vehicles"}, {"num": 83, "ref": "VH-22", "question": "Annual MVR reviews completed", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 84, "ref": "VH-23", "question": "No drivers under 21", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 85, "ref": "VH-24", "question": "Vehicles for company business only", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 86, "ref": "VH-25", "question": "Mobile Phone Agreement signed", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 87, "ref": "VH-26", "question": "Employees job-ready before driving", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 88, "ref": "VH-27", "question": "No unauthorized persons in vehicles", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 89, "ref": "VH-28", "question": "Accident report with witness statements", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 90, "ref": "VH-29", "question": "Driver point system communicated", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 91, "ref": "VH-30", "question": "MVR list current, all drivers verified", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 92, "ref": "HK-01", "question": "Carts properly loaded, not overloaded", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 93, "ref": "HK-02", "question": "Carts not blocking hallways/exits/fire equip", "criticality": "🔴 CRITICAL — Life Safety", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 94, "ref": "HK-03", "question": "Cart wheels and brakes functioning", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 95, "ref": "HK-04", "question": "Chemicals on carts labeled and stored upright", "criticality": "🔴 CRITICAL — HazCom", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 96, "ref": "HK-05", "question": "Knock and announce before entering rooms", "criticality": "🟠 HIGH — Security", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 97, "ref": "HK-06", "question": "Door security devices used per policy", "criticality": "🟠 HIGH — Security", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 98, "ref": "HK-07", "question": "Proper body mechanics when making beds", "criticality": "🟠 HIGH — Ergonomics", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 99, "ref": "HK-08", "question": "No standing on furniture/bathtubs/unstable surfaces", "criticality": "🔴 CRITICAL — Fall Prevention", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 100, "ref": "HK-09", "question": "Proper ventilation with cleaning chemicals in rooms", "criticality": "🟠 HIGH — Ventilation", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 101, "ref": "HK-10", "question": "Vacuum cords managed (trip prevention)", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 102, "ref": "HK-11", "question": "Wet floor signs placed immediately", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 103, "ref": "HK-12", "question": "Spills cleaned immediately", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 104, "ref": "HK-13", "question": "Proper lifting techniques for linen bags", "criticality": "🟠 HIGH — Ergonomics", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 105, "ref": "HK-14", "question": "Linen chute areas clean and unobstructed", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 106, "ref": "HK-15", "question": "Soiled linen handled with gloves (needlestick prevention)", "criticality": "🔴 CRITICAL — BBP", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 107, "ref": "HK-16", "question": "Found sharps/biohazards reported/handled correctly", "criticality": "🔴 CRITICAL — BBP", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 108, "ref": "HK-17", "question": "Lint traps cleaned regularly and documented", "criticality": "🟠 HIGH — Fire Prevention", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 109, "ref": "HK-18", "question": "Chemicals never mixed together", "criticality": "🔴 CRITICAL — Safety", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 110, "ref": "HK-19", "question": "Dilution systems maintained/calibrated", "criticality": "🟡 MEDIUM", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 111, "ref": "HK-20", "question": "PPE worn when handling chemicals", "criticality": "🔴 CRITICAL — PPE", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 112, "ref": "HK-21", "question": "Non-slip footwear worn by all HK employees", "criticality": "🔴 CRITICAL — Observable", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 113, "ref": "PA-01", "question": "Lobby floors clean, dry, slip/trip free", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 114, "ref": "PA-02", "question": "Entrance mats in good condition, secured (Report defective of trip hazard)", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 115, "ref": "PA-03", "question": "Wet floor signs during/after lobby cleaning", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 116, "ref": "PA-04", "question": "Furniture stable and in good repair (Report defective )", "criticality": "🟡 MEDIUM", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 117, "ref": "PA-05", "question": "Corridors well-lit and free from obstructions", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 118, "ref": "PA-06", "question": "Emergency exit signs illuminated and visible", "criticality": "🔴 CRITICAL — Life Safety", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 119, "ref": "PA-07", "question": "Stairwell handrails secure and in good condition", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 120, "ref": "PA-08", "question": "No storage blocking corridors/stairwells", "criticality": "🔴 CRITICAL — Life Safety", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 121, "ref": "PA-09", "question": "Restroom floors clean, dry, non-slip", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 122, "ref": "PA-10", "question": "Restroom cleaning chemicals labeled", "criticality": "🔴 CRITICAL — HazCom", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 123, "ref": "PA-11", "question": "Wet floor signs during restroom cleaning", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 124, "ref": "PA-12", "question": "Pool area wet floor signage, non-slip surfaces", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 125, "ref": "PA-13", "question": "Fitness area clean and hazard-free", "criticality": "🟡 MEDIUM", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 126, "ref": "PA-14", "question": "Pool chemical storage secure/labeled", "criticality": "🔴 CRITICAL — Chemical", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 127, "ref": "PA-15", "question": "Sidewalks/walkways clear", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 128, "ref": "PA-16", "question": "Loading dock organized, clean, safe", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 129, "ref": "PA-17", "question": "Elevator areas clean, transitions level", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 130, "ref": "PA-18", "question": "Emergency communication in elevators functional", "criticality": "🟡 MEDIUM", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 131, "ref": "PA-19", "question": "Cleaning equipment stored safely (not blocking access)", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 132, "ref": "KS-01", "question": "Kitchen floors clean, dry, grease-free", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 133, "ref": "KS-02", "question": "Non-slip floor mats in good condition", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 134, "ref": "KS-03", "question": "Wet floor signs during/after floor cleaning", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 135, "ref": "KS-04", "question": "Floor drains clean, unclogged, maintained", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 136, "ref": "KS-05", "question": "Non-slip closed-toe footwear worn", "criticality": "🔴 CRITICAL — Observable", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 137, "ref": "KS-06", "question": "Dishwashing area organized, hazard-free", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 138, "ref": "KS-07", "question": "Chemical dispensers properly functioning", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 139, "ref": "KS-08", "question": "PPE worn for hot water/chemicals (gloves, aprons)", "criticality": "🔴 CRITICAL — PPE", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 140, "ref": "KS-09", "question": "Broken glass/china handling procedures followed", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 141, "ref": "KS-10", "question": "Proper drainage, no standing water in dishwash", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 142, "ref": "KS-11", "question": "Exhaust hood filters clean", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 143, "ref": "KS-12", "question": "Ventilation systems functioning properly", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 144, "ref": "KS-13", "question": "Fire suppression in hood inspected (current tag)", "criticality": "🔴 CRITICAL — Fire Safety", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 145, "ref": "KS-14", "question": "Grease trap area clean, (Report clogged)", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 146, "ref": "KS-15", "question": "Waste/garbage areas clean, pest-free", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 147, "ref": "KS-16", "question": "Recycling/waste separation followed", "criticality": "🟡 MEDIUM", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 148, "ref": "KS-17", "question": "Dumpster/compactor area safe, accessible", "criticality": "🟡 MEDIUM", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 149, "ref": "KS-18", "question": "Kitchen chemicals labeled", "criticality": "🔴 CRITICAL — HazCom", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 150, "ref": "KS-19", "question": "SDS accessible for all kitchen chemicals", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 151, "ref": "KS-20", "question": "Chemicals stored separately from food", "criticality": "🔴 CRITICAL — Food Safety", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 152, "ref": "KS-21", "question": "Employees trained on kitchen chemical use", "criticality": "🟠 HIGH — Training", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 153, "ref": "KS-22", "question": "Hot surface warning signs posted", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 154, "ref": "KS-23", "question": "Cut-resistant gloves for knives/sharps", "criticality": "🟠 HIGH — PPE", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 155, "ref": "KS-24", "question": "First aid kit accessible in kitchen", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 156, "ref": "KS-25", "question": "Burns treatment supplies available", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 157, "ref": "EV-01", "question": "Floor care equipment in safe condition", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 158, "ref": "EV-02", "question": "Employees trained on floor care machinery", "criticality": "🟠 HIGH — Training", "shift": "2nd Shift", "section": "EVS"}, {"num": 159, "ref": "EV-03", "question": "Equipment electrical cords not frayed/damaged", "criticality": "🔴 CRITICAL — Fire/Shock", "shift": "2nd Shift", "section": "EVS"}, {"num": 160, "ref": "EV-04", "question": "Wet floor signs during floor care", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "2nd Shift", "section": "EVS"}, {"num": 161, "ref": "EV-05", "question": "Floor stripping chemicals: proper PPE + ventilation", "criticality": "🔴 CRITICAL — Chemical", "shift": "2nd Shift", "section": "EVS"}, {"num": 162, "ref": "EV-06", "question": "Equipment stored properly (not blocking exits)", "criticality": "🔴 CRITICAL — Life Safety", "shift": "2nd Shift", "section": "EVS"}, {"num": 163, "ref": "EV-07", "question": "Proper PPE for specialized cleaning", "criticality": "🔴 CRITICAL — PPE", "shift": "2nd Shift", "section": "EVS"}, {"num": 164, "ref": "EV-08", "question": "Pressure washing: safe use with training", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 165, "ref": "EV-09", "question": "Confined space entry procedures (if applicable)", "criticality": "🔴 CRITICAL — Life Safety", "shift": "2nd Shift", "section": "EVS"}, {"num": 166, "ref": "EV-10", "question": "Lockout/tagout for equipment maintenance", "criticality": "🔴 CRITICAL — Top 10 #5", "shift": "2nd Shift", "section": "EVS"}, {"num": 167, "ref": "EV-11", "question": "Laundry equipment guarded, safety devices functional", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 168, "ref": "EV-12", "question": "Laundry equipment training + emergency stops", "criticality": "🟠 HIGH — Training", "shift": "2nd Shift", "section": "EVS"}, {"num": 169, "ref": "EV-13", "question": "Laundry chemical dispensing maintained", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 170, "ref": "EV-14", "question": "Laundry area ventilated, temp controlled", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 171, "ref": "EV-15", "question": "Hot water/steam hazards guarded/signed", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 172, "ref": "EV-16", "question": "Soiled linen sorted with gloves (biohazard)", "criticality": "🔴 CRITICAL — BBP", "shift": "2nd Shift", "section": "EVS"}, {"num": 173, "ref": "EV-17", "question": "Waste areas clean, organized, pest-free", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 174, "ref": "EV-18", "question": "Proper containers for different waste streams", "criticality": "🟡 MEDIUM", "shift": "2nd Shift", "section": "EVS"}, {"num": 175, "ref": "EV-19", "question": "Waste segregation training completed", "criticality": "🟡 MEDIUM", "shift": "2nd Shift", "section": "EVS"}, {"num": 176, "ref": "EV-20", "question": "Hazardous waste disposed per regulations", "criticality": "🔴 CRITICAL — Regulatory", "shift": "2nd Shift", "section": "EVS"}, {"num": 177, "ref": "EV-21", "question": "Equipment inspected, maintenance logged", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 178, "ref": "EV-22", "question": "Storage rooms organized, ventilated", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 179, "ref": "EV-23", "question": "SDS binder accessible in EVS storage", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "2nd Shift", "section": "EVS"}, {"num": 180, "ref": "EV-24", "question": "Mop buckets/tools stored (no trip hazards)", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 181, "ref": "GC-01", "question": "All operators have valid licenses on file", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 182, "ref": "GC-02", "question": "Golf Cart Use Agreement signed", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 183, "ref": "GC-03", "question": "No operators under age 21", "criticality": "🔴 CRITICAL — Age Req", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 184, "ref": "GC-04", "question": "Only authorized trained employees operate", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 185, "ref": "GC-05", "question": "MVR consent for public road operators", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 186, "ref": "GC-06", "question": "Pre-use inspection before each shift", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 187, "ref": "GC-07", "question": "Battery/fuel level checked", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 188, "ref": "GC-08", "question": "Brakes tested and functioning", "criticality": "🔴 CRITICAL — Safety", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 189, "ref": "GC-09", "question": "Steering, horn, lights, mirrors functioning", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 190, "ref": "GC-10", "question": "Tires/wheels in good condition", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 191, "ref": "GC-11", "question": "Defective carts out of service immediately", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 192, "ref": "GC-12", "question": "Regular maintenance documented", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 193, "ref": "GC-13", "question": "Passengers seated, hands/feet inside", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 194, "ref": "GC-14", "question": "Parked with brake engaged, key removed", "criticality": "🔴 CRITICAL — Safety", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 195, "ref": "GC-15", "question": "No cell phone while operating cart", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 196, "ref": "GC-16", "question": "Parked overnight in designated areas", "criticality": "🟡 MEDIUM", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 197, "ref": "GC-17", "question": "Gas carts fueled in open/ventilated areas", "criticality": "🔴 CRITICAL — Fire", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 198, "ref": "GC-18", "question": "Incident reports for all cart accidents", "criticality": "🔴 CRITICAL — Recordkeeping", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 199, "ref": "GC-19", "question": "Cart incidents investigated by Risk Manager", "criticality": "🔴 CRITICAL — Investigation", "shift": "Day Shift", "section": "Golf Carts"}];
+const LOCATIONS = [{"id": "4169", "name": "1 Hotel Hanalei Bay", "region": "West", "state": "HI", "rvp": "Alan Ching", "manager": "Farhad Khaledi", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1005", "name": "Ballys (El Dorado) Shreveport", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Roger Barco", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1072", "name": "Foxwoods Casino", "region": "East", "state": "CT", "rvp": "Anibal Fernandez", "manager": "Kalet Garcia Torres", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4177", "name": "Garden of the Gods", "region": "West", "state": "CO", "rvp": "Alan Ching", "manager": "Alan Ching", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1055", "name": "Golden Nugget", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Maritzza Odom", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "4173", "name": "Great Wolf Lodge", "region": "East", "state": "CT", "rvp": "Anibal Fernandez", "manager": "Kalet Garcia Torres", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "999-1", "name": "Hilton LAX", "region": "West", "state": "CA", "rvp": "Alan Ching", "manager": "", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "999-3", "name": "Holiday Inn Sulphur", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Harrison Hutchinson", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "4011", "name": "Hyatt Regency Greenwich", "region": "Mid-Atlantic", "state": "CT", "rvp": "Eva Nika", "manager": "Richard Pierre", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "7022", "name": "Hyatt Regency Pinon Pointe VO", "region": "West", "state": "AZ", "rvp": "Alan Ching", "manager": "Esmeralda Medina Silva", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1012", "name": "LAuberge Casino Resort", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Maritza Odom", "sections": {"Housekeeping": true, "EVS": true, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4154", "name": "LegacyHotelandIMGABradenton", "region": "Florida", "state": "FL", "rvp": "Tayquan Taylor", "manager": "Alina Pichs Martinez", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "9021", "name": "Linq Promenade Las Vegas9021", "region": "West", "state": "NV", "rvp": "Alan Ching", "manager": "Andy Galan", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "997", "name": "Little Creek Casino", "region": "West", "state": "WA", "rvp": "Alan Ching", "manager": "Latoya Jackson", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1092", "name": "Live Casino & Hotel", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Caren Butterworth EVS", "sections": {"Housekeeping": false, "EVS": true, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1092-2", "name": "Live Casino & Hotel", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Robin Zamudio HSK", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1000", "name": "Mohegan Casino", "region": "Mid-Atlantic", "state": "PA", "rvp": "Eva Nika", "manager": "Michelle Santos", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1093", "name": "Muckleshoot Casino", "region": "West", "state": "WA", "rvp": "Alan Ching", "manager": "Latoya Jackson", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "999-2", "name": "Omni Homestead", "region": "Mid-Atlantic", "state": "VA", "rvp": "Eva Nika", "manager": "Marvin Martin", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1100", "name": "Osage Casino Downtown Tulsa", "region": "West", "state": "OK", "rvp": "Alan Ching", "manager": "Joshua Goodhue", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "4014", "name": "Peabody Memphis", "region": "Central", "state": "TN", "rvp": "Harrison Hutchinson", "manager": "Harrison Hutchinson", "sections": {"Housekeeping": true, "EVS": true, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "9028", "name": "Riverside Hospital", "region": "West", "state": "CA", "rvp": "Alan Ching", "manager": "Alan Ching", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4023", "name": "Roosevelt New Orleans", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "7050", "name": "SaddleBrook Resort", "region": "Florida", "state": "FL", "rvp": "Tayquan Taylor", "manager": "Carley Wike", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1070", "name": "Sams Town Shreveport", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Zawaunyka Washington", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "4171", "name": "Sea Island Resort", "region": "West", "state": "HI", "rvp": "Anibal Fernandez", "manager": "Martha Maruri", "sections": {"Housekeeping": false, "EVS": true, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "4172", "name": "Sea Island Resort GA", "region": "East", "state": "GA", "rvp": "Anibal Fernandez", "manager": "Martha Maruri", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "9026", "name": "Southern Hills Hospital", "region": "West", "state": "NV", "rvp": "Alan Ching", "manager": "Martha Maruri", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4175", "name": "The Jacquard Hotel", "region": "West", "state": "CO", "rvp": "Alan Ching", "manager": "Alan Ching", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4174", "name": "The Oxford Hotel", "region": "West", "state": "CO", "rvp": "Alan Ching", "manager": "Alan Ching", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "7038", "name": "Tucker Century Millenia", "region": "Florida", "state": "FL", "rvp": "Tayquan Taylor", "manager": "Tayquan Taylor", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "7037", "name": "Tucker Palmer Dadeland", "region": "Florida", "state": "FL", "rvp": "Tayquan Taylor", "manager": "Tayquan Taylor", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1091", "name": "Turfway Park Racing & Casino", "region": "Central", "state": "KY", "rvp": "Harrison Hutchinson", "manager": "Sara Abbas", "sections": {"Housekeeping": false, "EVS": true, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4180", "name": "Westin Fort Lauderdale", "region": "Florida", "state": "FL", "rvp": "Tayquan Taylor", "manager": "Ariel Christopher", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1089", "name": "Wind Creek Casino", "region": "Mid-Atlantic", "state": "PA", "rvp": "Eva Nika", "manager": "Michelle Santos", "sections": {"Housekeeping": true, "EVS": true, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}];
+
+const CORE = ['General Safety','Chemical Safety','Emergency Prep','Training & Docs'];
+const OPT  = ['Housekeeping','EVS','Public Areas','Kitchen/Stewarding','Vehicles','Golf Carts'];
+const ALLSEC = [...CORE,...OPT];
+const SQCOUNT = {};
+ALLSEC.forEach(s=>{ SQCOUNT[s]=QUESTIONS.filter(q=>q.section===s).length; });
+const COL = {
+  'General Safety':'#1e40af','Chemical Safety':'#7c3aed','Emergency Prep':'#b91c1c',
+  'Training & Docs':'#065f46','Housekeeping':'#0e7490','EVS':'#1d4ed8',
+  'Public Areas':'#4338ca','Kitchen/Stewarding':'#9d174d','Vehicles':'#92400e','Golf Carts':'#15803d'
+};
+
+const ans={}, notes={}, nar={}, naComment={};
+const collapseOverride={}; // ref -> true/false, set only when user manually taps to expand/collapse
+const NA_REASONS=[
+  'Resort responsibility, not brand standard',
+  'Service not provided by TSC at this location',
+  'No pool/spa on site',
+  'No vehicles operated at this location',
+  'No golf carts at this location',
+  'No kitchen/food service operations',
+  'Area not present at this property'
+];
+function naReasonOptions(current){
+  const isPreset=NA_REASONS.includes(current);
+  let opts='<option value="">\u2014 Select reason \u2014</option>';
+  opts+=NA_REASONS.map(r=>'<option value="'+xH(r)+'"'+(current===r?' selected':'')+'>'+xH(r)+'</option>').join('');
+  opts+='<option value="__other__"'+(!isPreset&&current?' selected':'')+'>Other (specify below)</option>';
+  return opts;
+}
+function isQCollapsed(q){
+  const a=ans[q.ref];
+  if(!a)return false; // never collapse an unanswered question
+  if(collapseOverride.hasOwnProperty(q.ref))return collapseOverride[q.ref];
+  if(a==='YES')return true;
+  if(a==='NO')return !!(notes[q.ref]||'').trim();
+  if(a==='N/A')return !!(nar[q.ref]||'').trim();
+  return false;
+}
+function toggleQCollapse(ref){
+  collapseOverride[ref]=!isQCollapsedByRef(ref);
+  render();
+}
+function isQCollapsedByRef(ref){
+  const q=QUESTIONS.find(x=>x.ref===ref);
+  return q?isQCollapsed(q):false;
+}
+const actionStatus={}; // ref -> {status:'Open'|'In Progress'|'Resolved', note:string}
+let finalized=false;
+let selLoc=null, actSec=new Set(CORE), sf='All', stf='All';
+const openS=new Set(ALLSEC);
+let flocs=[...LOCATIONS], hli=-1, inSum=false;
+
+// ── PERSISTENCE (auto-save + manual save, verified write-then-read-back) ──
+const STORAGE_KEY='tsc_self_assessment_v1';
+let persistOK=true;
+
+function snapshotState(){
+  return {
+    selLocId:selLoc?selLoc.id:null,
+    selLocName:selLoc?selLoc.name:null,
+    actSec:[...actSec],
+    ans:{...ans}, notes:{...notes}, nar:{...nar}, naComment:{...naComment},
+    actionStatus:JSON.parse(JSON.stringify(actionStatus)),
+    finalized,
+    completedBy:document.getElementById('locby')?.value||'',
+    quarter:document.getElementById('locqtr')?.value||'',
+    auditDate:document.getElementById('locdate')?.value||''
+  };
+}
+function persistState(){
+  const payload=JSON.stringify(snapshotState());
+  try{
+    localStorage.setItem(STORAGE_KEY, payload);
+    const readBack=localStorage.getItem(STORAGE_KEY);
+    if(readBack===payload){
+      persistOK=true;
+      showSaveIndicator(true);
+      hideStorageWarning();
+    } else {
+      throw new Error('read-back verification failed');
+    }
+  }catch(err){
+    persistOK=false;
+    showSaveIndicator(false);
+    showStorageWarning();
+    console.warn('Could not verify saved data in local storage:', err);
+  }
+}
+function loadPersistedState(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return;
+    const data=JSON.parse(raw);
+    if(!data)return;
+    if(data.selLocId){
+      selLoc=LOCATIONS.find(l=>l.id===data.selLocId && l.name===data.selLocName)||LOCATIONS.find(l=>l.id===data.selLocId)||null;
+    }
+    if(data.actSec) actSec=new Set(data.actSec);
+    if(data.ans) Object.assign(ans,data.ans);
+    if(data.notes) Object.assign(notes,data.notes);
+    if(data.nar) Object.assign(nar,data.nar);
+    if(data.naComment) Object.assign(naComment,data.naComment);
+    if(data.actionStatus) Object.assign(actionStatus,data.actionStatus);
+    finalized=!!data.finalized;
+    return data;
+  }catch(err){
+    console.warn('Could not load saved audit:', err);
+    return null;
+  }
+}
+function checkStorageHealthOnLoad(){
+  try{
+    const testKey='__tsc_storage_test__';
+    const testVal='test_'+Date.now();
+    localStorage.setItem(testKey, testVal);
+    const readBack=localStorage.getItem(testKey);
+    localStorage.removeItem(testKey);
+    if(readBack!==testVal){ persistOK=false; showStorageWarning(); }
+  }catch(err){ persistOK=false; showStorageWarning(); }
+}
+function showStorageWarning(){ const el=document.getElementById('storageWarning'); if(el) el.style.display=''; }
+function hideStorageWarning(){ const el=document.getElementById('storageWarning'); if(el) el.style.display='none'; }
+function showSaveIndicator(ok){
+  const el=document.getElementById('saveIndicator');
+  if(!el)return;
+  el.textContent=ok?'\u2713 Saved':'\u26a0\ufe0f Not saved';
+  el.style.color=ok?'#4ade80':'#f87171';
+  el.style.opacity='1';
+  clearTimeout(showSaveIndicator._t);
+  showSaveIndicator._t=setTimeout(()=>{ el.style.opacity='0'; },ok?1500:4000);
+}
+function manualSave(){
+  persistState();
+  if(persistOK){
+    alert('\u2713 Progress saved to this device. Safe to close or switch apps.');
+  } else {
+    alert('\u26a0\ufe0f This browser is not saving progress on this device. Export to Excel now to keep a permanent copy.');
+  }
+}
+
+// ── LOC SEARCH ──
+function filterLocs(){
+  const q=document.getElementById('ls').value.toLowerCase().trim();
+  flocs=q?LOCATIONS.filter(l=>String(l.name||'').toLowerCase().includes(q)||String(l.id||'').toLowerCase().includes(q)||String(l.region||'').toLowerCase().includes(q)||String(l.state||'').toLowerCase().includes(q)):[...LOCATIONS];
+  hli=-1; renderDD(); openDD();
+}
+function renderDD(){
+  const dd=document.getElementById('ldd');
+  dd.innerHTML=flocs.length===0?'<div class="lopt" style="color:#94a3b8;cursor:default">No matches</div>':
+    flocs.map((l,i)=>`<div class="lopt${i===hli?' hl':''}" onclick="pickLoc(${i})">
+      <div class="lopt-name"><span class="lopt-id">${xH(l.id)}</span>${xH(l.name)}</div>
+      <div class="lopt-meta">${xH(l.region)} &middot; ${xH(l.state)}${l.rvp?' &middot; RVP: '+xH(l.rvp):''}</div>
+    </div>`).join('');
+}
+function openDD(){renderDD();document.getElementById('ldd').classList.add('open');}
+function closeDD(){document.getElementById('ldd').classList.remove('open');}
+function handleKey(e){
+  if(!document.getElementById('ldd').classList.contains('open')){openDD();return;}
+  if(e.key==='ArrowDown'){hli=Math.min(hli+1,flocs.length-1);renderDD();e.preventDefault();}
+  else if(e.key==='ArrowUp'){hli=Math.max(hli-1,0);renderDD();e.preventDefault();}
+  else if(e.key==='Enter'&&hli>=0){pickLoc(hli);e.preventDefault();}
+  else if(e.key==='Escape')closeDD();
+}
+document.addEventListener('click',e=>{if(!document.getElementById('lsw').contains(e.target))closeDD();});
+
+function pickLoc(i){
+  selLoc=flocs[i];
+  document.getElementById('ls').value='';
+  closeDD();
+  document.getElementById('lcid').textContent=selLoc.id;
+  document.getElementById('lcname').textContent=selLoc.name;
+  document.getElementById('lcmeta').textContent=selLoc.region+' \u00b7 '+selLoc.state+(selLoc.rvp?' \u00b7 RVP: '+selLoc.rvp:'');
+  document.getElementById('lchip').style.display='flex';
+  document.getElementById('deleteSavedBtn').style.display=Object.keys(ans).length>0?'':'none';
+  actSec=new Set(CORE);
+  OPT.forEach(s=>{if(selLoc.sections[s])actSec.add(s);});
+  renderSetup();updateStartBtn();
+}
+function clearLoc(){
+  selLoc=null;
+  document.getElementById('lchip').style.display='none';
+  document.getElementById('ls').value='';
+  document.getElementById('ls').focus();
+  flocs=[...LOCATIONS];
+  actSec=new Set(CORE);
+  renderSetup();updateStartBtn();
+}
+let pendingDeleteSaved=false;
+let deleteSavedResetTimer=null;
+function requestDeleteSaved(){
+  const btn=document.getElementById('deleteSavedBtn');
+  if(!pendingDeleteSaved){
+    const n=Object.keys(ans).length;
+    pendingDeleteSaved=true;
+    btn.textContent='⚠️ Tap again — '+n+' lost';
+    clearTimeout(deleteSavedResetTimer);
+    deleteSavedResetTimer=setTimeout(()=>{
+      if(pendingDeleteSaved){
+        pendingDeleteSaved=false;
+        btn.textContent='🗑️ Delete Saved';
+      }
+    },4000);
+    return;
+  }
+  clearTimeout(deleteSavedResetTimer);
+  pendingDeleteSaved=false;
+  newAudit();
+  document.getElementById('deleteSavedBtn').style.display='none';
+}
+
+// ── SETUP TOGGLES ──
+function renderSetup(){
+  document.getElementById('stogrid').innerHTML=ALLSEC.map(s=>{
+    const isC=CORE.includes(s),isOn=actSec.has(s),c=COL[s]||'#334155';
+    const onclick=isC?'':('toggleSS(\''+s.replace(/'/g,"\\'")+'\')')
+    return '<div class="stog '+(isC?'core':'opt'+(isOn?' on':''))+'" style="--sc:'+c+'" onclick="'+onclick+'">'
+      +'<div class="sdot" style="background:'+c+'"></div>'
+      +'<div style="flex:1;min-width:0"><div class="slabel">'+s+'</div><div class="scount">'+SQCOUNT[s]+' q\'s</div></div>'
+      +(isC?'<span class="core-lock">CORE</span>':'<div class="tsw'+(isOn?' on':'')+'" style="--sc:'+c+'"></div>')
+      +'</div>';
+  }).join('');
+}
+function toggleSS(s){actSec.has(s)?actSec.delete(s):actSec.add(s);renderSetup();updateStartBtn();}
+function updateStartBtn(){
+  const btn=document.getElementById('startbtn');
+  if(selLoc){
+    const tot=[...actSec].reduce((s,k)=>s+(SQCOUNT[k]||0),0);
+    btn.disabled=false;
+    btn.textContent='Start Audit \u2014 '+tot+' questions \u2192';
+  } else {btn.disabled=true;btn.textContent='Select a location to begin \u2192';}
+}
+
+// ── START / BACK / NEW ──
+function startAudit(){
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('audit-screen').style.display='block';
+  ['pbadge','savebtn','sumbtn','albtn','expbtn','emailbtn','finalizebtn','newbtn','hloc','progress-wrap'].forEach(id=>{
+    document.getElementById(id).style.display='';
+  });
+  document.getElementById('hloctext').innerHTML=
+    '<span style="background:#1e3a8a;color:#bfdbfe;padding:1px 7px;border-radius:4px;font-weight:700;font-size:11px;margin-right:5px">'+xH(selLoc.id)+'</span>'
+    +'<strong style="color:#e2e8f0">'+xH(selLoc.name)+'</strong>'
+    +' <span style="color:#64748b">\u00b7 '+xH(selLoc.region)+' \u00b7 '+document.getElementById('locqtr').value+'</span>';
+  inSum=false;
+  updateFinalizedUI();
+  buildChips();renderSecMgmt();render();
+  persistState();
+}
+function backToSetup(){
+  document.getElementById('setup-screen').style.display='';
+  document.getElementById('audit-screen').style.display='none';
+  ['pbadge','savebtn','sumbtn','albtn','expbtn','emailbtn','finalizebtn','newbtn','hloc','progress-wrap'].forEach(id=>{
+    document.getElementById(id).style.display='none';
+  });
+  document.getElementById('deleteSavedBtn').style.display=Object.keys(ans).length>0?'':'none';
+  updateStartBtn();
+}
+let pendingNewAudit=false;
+let newAuditResetTimer=null;
+function requestNewAudit(){
+  const btn=document.getElementById('newbtn');
+  if(!pendingNewAudit){
+    const n=Object.keys(ans).length;
+    pendingNewAudit=true;
+    if(btn){
+      btn.textContent=n>0 ? '⚠️ Tap again — '+n+' lost' : '⚠️ Tap again';
+      btn.style.background='#dc2626';
+    }
+    // Auto-reset after a few seconds so it doesn't stay armed indefinitely if the
+    // manager gets distracted — same safety behavior as the Tracking Dashboard's
+    // "Clear All Loaded" button.
+    clearTimeout(newAuditResetTimer);
+    newAuditResetTimer=setTimeout(()=>{
+      if(pendingNewAudit){
+        pendingNewAudit=false;
+        if(btn){ btn.textContent='🔄 New Audit'; btn.style.background=''; }
+      }
+    },4000);
+    return;
+  }
+  clearTimeout(newAuditResetTimer);
+  pendingNewAudit=false;
+  if(btn){ btn.textContent='🔄 New Audit'; btn.style.background=''; }
+  newAudit();
+}
+function newAudit(){
+  Object.keys(ans).forEach(k=>delete ans[k]);
+  Object.keys(notes).forEach(k=>delete notes[k]);
+  Object.keys(nar).forEach(k=>delete nar[k]);
+  Object.keys(naComment).forEach(k=>delete naComment[k]);
+  Object.keys(actionStatus).forEach(k=>delete actionStatus[k]);
+  finalized=false;
+  sf='All';stf='All';inSum=false;
+  document.getElementById('locdate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('locby').value='';
+  backToSetup();
+  // Fully clear the location too — otherwise a manager who wanted a genuinely fresh
+  // start lands back on setup with the exact same location still selected, which looks
+  // like nothing happened, especially when there were no answers to visibly lose.
+  clearLoc();
+  persistState();
+}
+
+// ── SEC MGMT ──
+function renderSecMgmt(){
+  document.getElementById('smgrid').innerHTML=ALLSEC.map(s=>{
+    const isC=CORE.includes(s),isOn=actSec.has(s),c=COL[s]||'#334155';
+    const onclick=isC?'':('toggleAS(\''+s.replace(/'/g,"\\'")+'\')')
+    return '<div class="smi '+(isC?'core':'opt'+(isOn?' on':''))+'" style="--sc:'+c+'" onclick="'+onclick+'">'
+      +'<div class="smidot" style="background:'+c+'"></div>'
+      +'<span style="flex:1">'+s+'</span>'
+      +(isC?'<span style="font-size:9px;color:#6366f1;font-weight:700;background:#e0e7ff;border-radius:3px;padding:1px 4px">CORE</span>'
+           :'<div class="smisw"></div>')
+      +'</div>';
+  }).join('');
+  const tot=[...actSec].reduce((s,k)=>s+(SQCOUNT[k]||0),0);
+  document.getElementById('secpanelcount').textContent='('+actSec.size+' sections \u00b7 '+tot+' questions)';
+}
+function toggleAS(s){actSec.has(s)?actSec.delete(s):actSec.add(s);renderSecMgmt();buildChips();render();persistState();}
+
+// ── CHIPS ──
+function buildChips(){
+  const active=ALLSEC.filter(s=>actSec.has(s));
+  document.getElementById('fchips').innerHTML=['All',...active].map(s=>{
+    const on=(s==='All'&&sf==='All')||(s!=='All'&&sf===s);
+    const bg=on?(s==='All'?'#334155':COL[s]||'#334155'):(s!=='All'?COL[s]||'#f1f5f9':'');
+    const op=(!on&&s!=='All')?'opacity:.4;':'';
+    return '<button class="chip" onclick="setSF(\''+s+'\')" style="background:'+bg+';color:'+(on?'#fff':'')+(s!=='All'&&!on?';opacity:.45':'')+'">' +s+'</button>';
+  }).join('');
+  document.getElementById('stchips').innerHTML=['All','Unanswered','YES','NO','N/A'].map(f=>{
+    const on=stf===f;
+    return '<button class="chip" onclick="setSTF(\''+f+'\')" style="'+(on?'background:#334155;color:#fff':'')+'">' +f+'</button>';
+  }).join('');
+}
+function setSF(v){sf=v;buildChips();render();}
+function setSTF(v){stf=v;buildChips();render();}
+
+function activeQs(){return QUESTIONS.filter(q=>actSec.has(q.section));}
+function filteredQs(){
+  const s=document.getElementById('si').value.toLowerCase();
+  return activeQs().filter(q=>{
+    if(sf!=='All'&&q.section!==sf)return false;
+    const a=ans[q.ref];
+    if(stf==='Unanswered'&&a)return false;
+    if(stf==='YES'&&a!=='YES')return false;
+    if(stf==='NO'&&a!=='NO')return false;
+    if(stf==='N/A'&&a!=='N/A')return false;
+    if(!s)return true;
+    return q.question.toLowerCase().includes(s)||q.ref.toLowerCase().includes(s)||q.section.toLowerCase().includes(s);
+  });
+}
+function critC(c){return c.startsWith('\ud83d\udd34')?'cr':c.startsWith('\ud83d\udfe0')?'co':'cy';}
+
+function render(){
+  if(inSum){renderSum();return;}
+  const fq=filteredQs();
+  const searching=document.getElementById('si').value.trim()!=='';
+  const grouped={};
+  ALLSEC.filter(s=>actSec.has(s)).forEach(s=>{grouped[s]=[];});
+  fq.forEach(q=>{if(grouped[q.section])grouped[q.section].push(q);});
+
+  let html='';
+  ALLSEC.filter(s=>actSec.has(s)).forEach(sec=>{
+    const qs=grouped[sec];
+    if(!qs||!qs.length)return;
+    const c=COL[sec]||'#334155';
+    const sy=qs.filter(q=>ans[q.ref]==='YES').length;
+    const sn=qs.filter(q=>ans[q.ref]==='NO').length;
+    const sna=qs.filter(q=>ans[q.ref]==='N/A').length;
+    const su=qs.length-sy-sn-sna;
+    const sc=(sy+sn)>0?Math.round(sy/(sy+sn)*100):0;
+    const isOpen=searching||openS.has(sec);
+    const sid='sec_'+sec.replace(/[^a-zA-Z0-9]/g,'_');
+
+    html+='<div class="sh" onclick="toggleSec(\''+sec.replace(/'/g,"\\'")+'\')"><div class="shl">'
+      +'<div class="shdot" style="background:'+c+'"></div>'
+      +'<span class="shtitle">'+sec+'</span>'
+      +'<span style="font-size:11px;color:#94a3b8">'+qs.length+' items</span>'
+      +'</div><div class="shr"><div style="text-align:right">'
+      +'<div style="font-size:11px;color:#94a3b8">'+sy+'\u2713 '+sn+'\u2717 '+sna+'N/A'+(su>0?' \u00b7 '+su+' left':'')+'</div>'
+      +'<div class="shmbar" style="margin-top:3px;margin-left:auto"><div class="shmfill" style="width:'+sc+'%;background:'+c+'"></div></div>'
+      +'</div><div class="shchev'+(isOpen?' open':'')+'">&#9660;</div></div></div>'
+      +'<div class="sbody'+(isOpen?' open':'')+'">';
+
+    qs.forEach(q=>{
+      const a=ans[q.ref]||'';
+      const collapsed=isQCollapsed(q);
+
+      if(collapsed){
+        const pillColor=a==='YES'?'#15803d':a==='NO'?'#b91c1c':'#374151';
+        const pillBg=a==='YES'?'#dcfce7':a==='NO'?'#fee2e2':'#f3f4f6';
+        html+='<div class="qc qc-collapsed" onclick="toggleQCollapse(\''+q.ref+'\')">'
+          +'<span class="bdg" style="background:'+c+';color:#fff">'+q.ref+'</span>'
+          +'<span class="qc-collapsed-text">'+xH(q.question)+'</span>'
+          +'<span class="bdg" style="background:'+pillBg+';color:'+pillColor+';font-weight:800">'+a+'</span>'
+          +'<span class="qc-collapsed-chevron">\u25be</span>'
+          +'</div>';
+        return;
+      }
+
+      const nN=a==='NO'&&!(notes[q.ref]||'').trim();
+      const nR=a==='N/A'&&!(nar[q.ref]||'').trim();
+      let cls='qc'+(nN||nR?' warn':a==='YES'?' ayes':a==='NO'?' ano':a==='N/A'?' ana':'')+(finalized?' locked':'');
+      const dis=finalized?' disabled':'';
+      let nh='';
+      if(a==='NO')nh='<div class="na"><span class="nl '+(nN?'r':'g')+'">'+(nN?'\u26a0\ufe0f Notes required':'\ud83d\udcdd Notes')+'</span>'
+        +'<textarea class="nta'+(nN?' r':'')+'" rows="2" placeholder="Describe the issue or corrective action\u2026" oninput="setN(\''+q.ref+'\',this.value)"'+dis+'>'+xH(notes[q.ref]||'')+'</textarea></div>';
+      else if(a==='N/A'){
+        const current=nar[q.ref]||'';
+        const isPreset=NA_REASONS.includes(current);
+        nh='<div class="na"><span class="nl w">'+(nR?'\u26a0\ufe0f Reason required \u2014 why N/A?':'Reason this does not apply')+'</span>'
+          +'<select class="nta" style="margin-bottom:6px" onchange="setNRPreset(\''+q.ref+'\',this.value)"'+dis+'>'+naReasonOptions(current)+'</select>'
+          +(!isPreset?'<textarea class="nta'+(nR?' w':'')+'" rows="2" placeholder="Specify reason\u2026" oninput="setNR(\''+q.ref+'\',this.value)"'+dis+'>'+xH(current)+'</textarea>':'')
+          +'<div style="margin-top:6px"><span class="nl g" style="font-size:10px">\ud83d\udcac Additional comment (optional)</span>'
+          +'<textarea class="nta" rows="2" placeholder="Any extra context\u2026" oninput="setNAComment(\''+q.ref+'\',this.value)"'+dis+'>'+xH(naComment[q.ref]||'')+'</textarea></div>'
+          +'</div>';
+      }
+      else if(a==='YES')nh='<div class="na"><span class="nl g">\ud83d\udcdd Optional notes</span>'
+        +'<textarea class="nta" rows="2" placeholder="Add observations\u2026" oninput="setN(\''+q.ref+'\',this.value)"'+dis+'>'+xH(notes[q.ref]||'')+'</textarea></div>';
+
+      const collapseBtn=a?'<button class="qc-collapse-btn" onclick="toggleQCollapse(\''+q.ref+'\')">\u25b4 Collapse</button>':'';
+
+      html+='<div class="'+cls+'"><div class="qtop">'
+        +'<div class="qbody"><div class="qmeta">'
+        +'<span class="bdg" style="background:'+c+';color:#fff">'+q.ref+'</span>'
+        +'<span class="bdg '+critC(q.criticality)+'">'+q.criticality+'</span>'
+        +'<span style="font-size:10px;color:#94a3b8">'+q.shift+'</span>'
+        +'</div><div class="qq"><span class="qnum">#'+q.num+' </span>'+xH(q.question)+'</div></div>'
+        +'<div class="qbtns">'
+        +'<button class="ab'+(a==='YES'?' sy':'')+'" onclick="setA(\''+q.ref+'\',\'YES\')"'+dis+'>YES</button>'
+        +'<button class="ab'+(a==='NO'?' sn':'')+'" onclick="setA(\''+q.ref+'\',\'NO\')"'+dis+'>NO</button>'
+        +'<button class="ab'+(a==='N/A'?' sna':'')+'" onclick="setA(\''+q.ref+'\',\'N/A\')"'+dis+'>N/A</button>'
+        +'</div></div>'+nh+collapseBtn+'</div>';
+    });
+    html+='</div>';
+  });
+
+  if(!fq.length)html='<div style="text-align:center;padding:36px;color:#94a3b8;background:#fff;border-radius:10px">No questions match your filters.</div>';
+  document.getElementById('qcon').innerHTML=html;
+  document.getElementById('fcnt').textContent='Showing '+fq.length+' of '+activeQs().length+' questions';
+  updateProg();
+}
+
+function toggleSec(s){openS.has(s)?openS.delete(s):openS.add(s);render();}
+function expandAll(){ALLSEC.forEach(s=>openS.add(s));render();}
+function collapseAll(){openS.clear();render();}
+function xH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function setA(ref,v){if(finalized)return;ans[ref]===v?delete ans[ref]:ans[ref]=v;delete collapseOverride[ref];render();persistState();}
+function setN(ref,v){if(finalized)return;notes[ref]=v;updateProg();persistState();}
+function setNR(ref,v){if(finalized)return;nar[ref]=v;updateProg();persistState();}
+function setNRPreset(ref,val){if(finalized)return;nar[ref]=(val==='__other__')?'':val;render();updateProg();persistState();}
+function setNAComment(ref,v){if(finalized)return;naComment[ref]=v;persistState();}
+
+function updateProg(){
+  const qs=activeQs();
+  const yes=qs.filter(q=>ans[q.ref]==='YES').length;
+  const no=qs.filter(q=>ans[q.ref]==='NO').length;
+  const na=qs.filter(q=>ans[q.ref]==='N/A').length;
+  const answered=yes+no+na,tot=qs.length;
+  const noM=qs.filter(q=>ans[q.ref]==='NO'&&!(notes[q.ref]||'').trim()).length;
+  const naM=qs.filter(q=>ans[q.ref]==='N/A'&&!(nar[q.ref]||'').trim()).length;
+  const pct=tot>0?Math.round(answered/tot*100):0;
+  document.getElementById('progress-bar').style.width=pct+'%';
+  document.getElementById('progress-bar').style.background=pct===100?'#4ade80':'#3b82f6';
+  document.getElementById('progress-text').textContent=answered+' of '+tot+' answered';
+  const pb=document.getElementById('pbadge');
+  pb.textContent=answered+' / '+tot;pb.style.color=pct===100?'#4ade80':'#f59e0b';
+  document.getElementById('nowarn').style.display=noM>0?'':'none';
+  document.getElementById('nawarn').style.display=naM>0?'':'none';
+  document.getElementById('nowarn').textContent='\u26a0\ufe0f '+noM+' NO missing notes';
+  document.getElementById('nawarn').textContent='\u26a0\ufe0f '+naM+' N/A missing reasons';
+}
+
+// ── FINALIZE & LOCK (audit answers become permanent; action list stays editable) ──
+let pendingFinalize=false;
+function requestFinalize(){
+  pendingFinalize=true;
+  updateFinalizedUI();
+}
+function cancelFinalize(){
+  pendingFinalize=false;
+  updateFinalizedUI();
+}
+function confirmFinalize(){
+  finalized=true;
+  pendingFinalize=false;
+  // Seed action list entries for every NO item that doesn't have one yet
+  activeQs().filter(q=>ans[q.ref]==='NO').forEach(q=>{
+    if(!actionStatus[q.ref]) actionStatus[q.ref]={status:'Open',note:''};
+  });
+  persistState();
+  updateFinalizedUI();
+  render();
+  if(!inSum) toggleActionList();
+}
+let pendingUnlock=false;
+function requestUnlock(){
+  pendingUnlock=true;
+  updateFinalizedUI();
+}
+function cancelUnlock(){
+  pendingUnlock=false;
+  updateFinalizedUI();
+}
+function confirmUnlock(){
+  finalized=false;
+  pendingUnlock=false;
+  persistState();
+  updateFinalizedUI();
+  render();
+}
+function updateFinalizedUI(){
+  const banner=document.getElementById('finalizedBanner');
+  const finalizeBtn=document.getElementById('finalizebtn');
+  const confirmBar=document.getElementById('finalizeConfirmBar');
+  const unlockBtn=document.getElementById('unlockbtn');
+  const unlockBar=document.getElementById('unlockConfirmBar');
+  if(finalized){
+    banner.style.display='';
+    banner.textContent='\ud83d\udd12 This audit is finalized \u2014 answers are locked. Use the Action List to track remediation.';
+    finalizeBtn.style.display='none';
+    if(unlockBtn){
+      unlockBtn.style.display='';
+      unlockBtn.textContent=pendingUnlock?'\u26a0\ufe0f Tap to confirm unlock':'\ud83d\udd13 Unlock to Fix a Mistake';
+      unlockBtn.style.background=pendingUnlock?'#dc2626':'#64748b';
+      unlockBtn.onclick=pendingUnlock?confirmUnlock:requestUnlock;
+    }
+  } else {
+    banner.style.display='none';
+    finalizeBtn.style.display='';
+    finalizeBtn.textContent=pendingFinalize?'\u26a0\ufe0f Tap to confirm':'\u2705 Finalize';
+    finalizeBtn.style.background=pendingFinalize?'#dc2626':'#1e3a8a';
+    finalizeBtn.onclick=pendingFinalize?confirmFinalize:requestFinalize;
+    if(unlockBtn) unlockBtn.style.display='none';
+  }
+  if(confirmBar) confirmBar.style.display=pendingFinalize?'':'none';
+  if(unlockBar) unlockBar.style.display=pendingUnlock?'':'none';
+}
+
+// ── ACTION LIST (tracks remediation status separately from the locked audit answers) ──
+function toggleActionList(){
+  const pane=document.getElementById('actionListPane');
+  const showing=pane.style.display==='block';
+  pane.style.display=showing?'none':'block';
+  document.getElementById('formpane').style.display=showing?'':'none';
+  document.getElementById('sumpane').style.display='none';
+  inSum=false;
+  document.getElementById('filterbar').style.display=showing?'':'none';
+  document.getElementById('secpanel').style.display=showing?'':'none';
+  const exprow=document.querySelector('.exprow'); if(exprow) exprow.style.display=showing?'':'none';
+  document.getElementById('sumbtn').textContent='\ud83d\udcca Summary';
+  document.getElementById('albtn').textContent=showing?'\ud83d\udccb Action List':'\u2190 Back';
+  if(!showing) renderActionList();
+}
+// ── SLA DUE-DATE (Critical=2wk, High=3wk, Medium=4wk from the audit date) ──
+// Purely a visibility/awareness aid — never blocks anything. A manager legitimately
+// waiting on ordered parts should use the "In Progress" status + note to explain why,
+// rather than the deadline itself being extended or hidden.
+const SLA_DAYS={CRITICAL:14, HIGH:21, MEDIUM:28};
+function slaLevelFromCriticality(criticality){
+  const s=String(criticality||'').toUpperCase();
+  if(s.includes('CRITICAL'))return 'CRITICAL';
+  if(s.includes('HIGH'))return 'HIGH';
+  if(s.includes('MEDIUM'))return 'MEDIUM';
+  return null;
+}
+function computeSLADueDate(criticality, auditDateStr){
+  const level=slaLevelFromCriticality(criticality);
+  if(!level || !auditDateStr) return null;
+  const auditDate=new Date(auditDateStr+'T00:00:00');
+  if(isNaN(auditDate.getTime())) return null;
+  const due=new Date(auditDate.getTime() + SLA_DAYS[level]*24*60*60*1000);
+  return due;
+}
+function slaBadgeHtml(criticality, status){
+  if(status==='Resolved') return '<span class="sla-badge sla-done">\u2705 Resolved</span>';
+  const auditDateStr=document.getElementById('locdate')?.value||'';
+  const due=computeSLADueDate(criticality, auditDateStr);
+  if(!due) return '';
+  const today=new Date(); today.setHours(0,0,0,0);
+  const daysLeft=Math.round((due-today)/(24*60*60*1000));
+  const dueLabel=due.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  if(daysLeft<0) return '<span class="sla-badge sla-overdue">\ud83d\udd34 Overdue \u2014 was due '+dueLabel+'</span>';
+  if(daysLeft<=3) return '<span class="sla-badge sla-soon">\ud83d\udfe1 Due '+dueLabel+' ('+daysLeft+' day'+(daysLeft===1?'':'s')+' left)</span>';
+  return '<span class="sla-badge sla-ontrack">\ud83d\udfe2 Due '+dueLabel+'</span>';
+}
+
+function renderActionList(){
+  const qs=activeQs().filter(q=>ans[q.ref]==='NO');
+  const wrap=document.getElementById('actionListPane');
+  if(!qs.length){
+    wrap.innerHTML='<div style="text-align:center;padding:36px;color:#94a3b8;background:#fff;border-radius:10px">No NO findings on this audit \u2014 nothing to track.</div>';
+    return;
+  }
+  const order={'Open':0,'In Progress':1,'Resolved':2};
+  const sorted=[...qs].sort((a,b)=>{
+    const sa=(actionStatus[a.ref]||{}).status||'Open', sb=(actionStatus[b.ref]||{}).status||'Open';
+    return order[sa]-order[sb];
+  });
+  wrap.innerHTML='<div class="scard" style="margin-bottom:12px"><h2 style="font-size:15px">\ud83d\udccb Action List</h2>'
+    +'<div class="sub">Track remediation here \u2014 this does not change the original audit answers. Target timeframes: Critical 2 weeks, High 3 weeks, Medium 4 weeks from the audit date.</div></div>'
+    +sorted.map(q=>{
+      const st=actionStatus[q.ref]||{status:'Open',note:''};
+      const cls=st.status==='In Progress'?'status-progress':st.status==='Resolved'?'status-resolved':'';
+      return '<div class="al-item '+cls+'">'
+        +'<div class="al-meta">'+xH(q.ref)+' \u00b7 '+xH(q.section)+' \u00b7 '+q.criticality+'</div>'
+        +'<div class="al-q">'+xH(q.question)+'</div>'
+        +(notes[q.ref]?'<div class="al-note">Original note: '+xH(notes[q.ref])+'</div>':'')
+        +'<div style="margin:6px 0">'+slaBadgeHtml(q.criticality, st.status)+'</div>'
+        +'<div class="al-controls">'
+        +'<select onchange="setActionStatus(\''+q.ref+'\',this.value)">'
+        +['Open','In Progress','Resolved'].map(s=>'<option value="'+s+'"'+(st.status===s?' selected':'')+'>'+s+'</option>').join('')
+        +'</select>'
+        +'<input type="text" placeholder="Resolution note (optional)" value="'+xH(st.note||'')+'" oninput="setActionNote(\''+q.ref+'\',this.value)">'
+        +'</div></div>';
+    }).join('');
+}
+function setActionStatus(ref,status){
+  if(!actionStatus[ref]) actionStatus[ref]={status:'Open',note:''};
+  actionStatus[ref].status=status;
+  // Capture the actual date resolved — this is what makes a real lag-to-closure metric
+  // possible later, not just "is it currently overdue". If reopened and resolved again,
+  // the date resets — the most recent resolution is what actually matters for how long
+  // it took to genuinely get fixed, not a stale earlier attempt that didn't hold.
+  if(status==='Resolved' && !actionStatus[ref].resolvedDate){
+    actionStatus[ref].resolvedDate=new Date().toISOString().slice(0,10);
+  }
+  if(status!=='Resolved'){
+    delete actionStatus[ref].resolvedDate;
+  }
+  persistState();
+  // Deferred, not immediate: renderActionList() re-sorts by status and rebuilds this
+  // exact <select> element — doing that synchronously, inside the element's own onchange
+  // handler, can interrupt the browser mid-interaction (especially on mobile) and cause
+  // the selection to not stick. Letting the current event finish first avoids that.
+  setTimeout(renderActionList, 0);
+}
+function setActionNote(ref,note){
+  if(!actionStatus[ref]) actionStatus[ref]={status:'Open',note:''};
+  actionStatus[ref].note=note;
+  persistState();
+}
+
+// ── SUMMARY ──
+function toggleSum(){
+  inSum=!inSum;
+  document.getElementById('formpane').style.display=inSum?'none':'';
+  document.getElementById('sumpane').style.display=inSum?'block':'none';
+  document.getElementById('actionListPane').style.display='none';
+  document.getElementById('albtn').textContent='\ud83d\udccb Action List';
+  document.getElementById('filterbar').style.display=inSum?'none':'';
+  document.getElementById('secpanel').style.display=inSum?'none':'';
+  document.querySelector('.exprow').style.display=inSum?'none':'';
+  document.getElementById('sumbtn').textContent=inSum?'\u2190 Back':'\ud83d\udcca Summary';
+  if(inSum)renderSum();
+}
+function renderSum(){
+  const qs=activeQs();
+  const yes=qs.filter(q=>ans[q.ref]==='YES').length;
+  const no=qs.filter(q=>ans[q.ref]==='NO').length;
+  const na=qs.filter(q=>ans[q.ref]==='N/A').length;
+  const answered=yes+no+na,tot=qs.length;
+  const score=(yes+no)>0?Math.round(yes/(yes+no)*100):0;
+  const sc=score>=90?'#4ade80':score>=70?'#fbbf24':'#f87171';
+  const by=document.getElementById('locby').value;
+  const qtr=document.getElementById('locqtr').value;
+  document.getElementById('sumhero').innerHTML=
+    '<div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Audit Summary</div>'
+    +'<div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end">'
+    +'<div><div class="sumscore" style="color:'+sc+'">'+score+'%</div>'
+    +'<div style="font-size:12px;color:#94a3b8;margin-top:3px">Compliance (YES \u00f7 answered)</div></div>'
+    +'<div class="sumstats">'
+    +'<div class="sumstat"><div class="v" style="color:#4ade80">'+yes+'</div><div class="l">YES</div></div>'
+    +'<div class="sumstat"><div class="v" style="color:#f87171">'+no+'</div><div class="l">NO</div></div>'
+    +'<div class="sumstat"><div class="v" style="color:#94a3b8">'+na+'</div><div class="l">N/A</div></div>'
+    +'<div class="sumstat"><div class="v" style="color:#fbbf24">'+(tot-answered)+'</div><div class="l">Unanswered</div></div>'
+    +'</div></div>'
+    +'<div style="margin-top:10px;font-size:12px;color:#94a3b8">'
+    +'<span style="background:#1e3a8a;color:#bfdbfe;padding:1px 7px;border-radius:4px;font-weight:700;font-size:11px;margin-right:5px">'+xH(selLoc.id)+'</span>'
+    +'<strong style="color:#e2e8f0">'+xH(selLoc.name)+'</strong>'
+    +' \u00b7 '+xH(selLoc.region)+(by?' \u00b7 '+xH(by):'')+' \u00b7 '+qtr+'</div>';
+
+  let sh='<h3>Score by Section</h3>';
+  ALLSEC.filter(s=>actSec.has(s)).forEach(sec=>{
+    const sq=qs.filter(q=>q.section===sec);
+    const sy=sq.filter(q=>ans[q.ref]==='YES').length;
+    const sn=sq.filter(q=>ans[q.ref]==='NO').length;
+    const sna=sq.filter(q=>ans[q.ref]==='N/A').length;
+    const su=sq.length-sy-sn-sna;
+    const sc2=(sy+sn)>0?Math.round(sy/(sy+sn)*100):null;
+    const c=COL[sec]||'#334155';
+    sh+='<div class="srow"><div class="srowtop">'
+      +'<span style="font-weight:600;color:'+c+'">'+sec+'</span>'
+      +'<span style="color:#64748b">'+(sc2!==null?sc2+'%':'\u2014')+' \u00b7 '+sy+'\u2713 '+sn+'\u2717 '+sna+'N/A'+(su>0?' ('+su+' left)':'')+'</span>'
+      +'</div><div class="sbar"><div class="sbarfill" style="width:'+(sc2||0)+'%;background:'+c+'"></div></div></div>';
+  });
+  document.getElementById('sumsecs').innerHTML=sh;
+
+  const issues=qs.filter(q=>ans[q.ref]==='NO').sort((a,b)=>{
+    const r=c=>c.startsWith('\ud83d\udd34')?0:c.startsWith('\ud83d\udfe0')?1:2;
+    return r(a.criticality)-r(b.criticality);
+  });
+  const ie=document.getElementById('sumiss');
+  if(issues.length){
+    ie.style.display='';
+    let ih='<h3 style="color:#b91c1c">\u26a0\ufe0f Issues Requiring Action ('+issues.length+')</h3>';
+    issues.forEach(q=>{
+      const bc=q.criticality.startsWith('\ud83d\udd34')?'#ef4444':q.criticality.startsWith('\ud83d\udfe0')?'#f97316':'#eab308';
+      ih+='<div class="iss" style="border-color:'+bc+'">'
+        +'<div class="issmeta">'+q.ref+' \u00b7 '+q.section+' \u00b7 '+q.criticality+'</div>'
+        +'<div class="issq">'+xH(q.question)+'</div>'
+        +(notes[q.ref]?'<div class="issnote">Note: '+xH(notes[q.ref])+'</div>':'<div class="isswarn">\u26a0\ufe0f No notes added</div>')
+        +'</div>';
+    });
+    ie.innerHTML=ih;
+  } else ie.style.display='none';
+}
+
+// ── XLSX EXPORT (pure JS, no CDN) ──
+const NSS='http://schemas.openxmlformats.org/spreadsheetml/2006/main';
+const NSR='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+const NSP='http://schemas.openxmlformats.org/package/2006/relationships';
+const NSC='http://schemas.openxmlformats.org/package/2006/content-types';
+
+function xesc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function colL(ci){let s='';ci++;while(ci>0){ci--;s=String.fromCharCode(65+ci%26)+s;ci=Math.floor(ci/26);}return s;}
+
+function shXml(rows,protect){
+  let x='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="'+NSS+'"><sheetData>';
+  rows.forEach((row,ri)=>{
+    if(!row)return;
+    if(!row.some(c=>c!==null&&c!==undefined&&c!==''))return;
+    x+='<row r="'+(ri+1)+'">';
+    row.forEach((cell,ci)=>{
+      if(cell===null||cell===undefined||cell==='')return;
+      const ref=colL(ci)+(ri+1);
+      if(typeof cell==='number'&&isFinite(cell))x+='<c r="'+ref+'" t="n"><v>'+cell+'</v></c>';
+      else x+='<c r="'+ref+'" t="inlineStr"><is><t xml:space="preserve">'+xesc(cell)+'</t></is></c>';
+    });
+    x+='</row>';
+  });
+  x+='</sheetData>';
+  if(protect){
+    x+='<sheetProtection sheet="1" objects="1" scenarios="1" formatCells="0" formatColumns="0" formatRows="0" selectLockedCells="1" selectUnlockedCells="1"/>';
+  }
+  return x+'</worksheet>';
+}
+
+function stylesXml(){
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    +'<styleSheet xmlns="'+NSS+'"><numFmts count="0"/>'
+    +'<fonts count="1"><font><sz val="11"/><color theme="1"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font></fonts>'
+    +'<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
+    +'<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>'
+    +'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    +'<cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>'
+    +'<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
+    +'</styleSheet>';
+}
+
+const ENC=new TextEncoder();
+function u16(n){const b=new Uint8Array(2);b[0]=n&0xFF;b[1]=(n>>8)&0xFF;return b;}
+function u32(n){const b=new Uint8Array(4);b[0]=n&0xFF;b[1]=(n>>8)&0xFF;b[2]=(n>>16)&0xFF;b[3]=(n>>24)&0xFF;return b;}
+const CRC_T=(()=>{const t=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++)c=c&1?(0xEDB88320^(c>>>1)):(c>>>1);t[i]=c;}return t;})();
+function crc32(buf){let c=0xFFFFFFFF;for(const b of buf)c=CRC_T[(c^b)&0xFF]^(c>>>8);return(c^0xFFFFFFFF)>>>0;}
+function cat(...a){const len=a.reduce((s,x)=>s+x.length,0);const r=new Uint8Array(len);let o=0;for(const x of a){r.set(x,o);o+=x.length;}return r;}
+
+function zipEntry(name,data){
+  const nb=ENC.encode(name),crc=crc32(data),sz=data.length;
+  const local=cat(new Uint8Array([0x50,0x4B,0x03,0x04]),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(sz),u32(sz),u16(nb.length),u16(0),nb,data);
+  return{local,nb,crc,sz};
+}
+function buildZip(files){
+  const entries=files.map(([n,d])=>zipEntry(n,d));
+  let off=0;
+  const cds=entries.map(e=>{
+    const cd=cat(new Uint8Array([0x50,0x4B,0x01,0x02]),u16(20),u16(20),u16(0),u16(0),u16(0),u16(0),u32(e.crc),u32(e.sz),u32(e.sz),u16(e.nb.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(off),e.nb);
+    off+=e.local.length;return cd;
+  });
+  const cdData=cat(...cds);
+  const eocd=cat(new Uint8Array([0x50,0x4B,0x05,0x06,0x00,0x00,0x00,0x00]),u16(entries.length),u16(entries.length),u32(cdData.length),u32(off),u16(0));
+  return cat(...entries.map(e=>e.local),cdData,eocd);
+}
+
+function buildWorkbookBlob(){
+  const qs=activeQs();
+  const uid=selLoc?selLoc.id:'',loc=selLoc?'['+selLoc.id+'] '+selLoc.name:'';
+  const region=selLoc?selLoc.region:'',state=selLoc?selLoc.state:'';
+  const by=document.getElementById('locby').value||'',qtr=document.getElementById('locqtr').value;
+  const auditDate=document.getElementById('locdate').value||new Date().toISOString().slice(0,10);
+  const yes=qs.filter(q=>ans[q.ref]==='YES').length;
+  const no=qs.filter(q=>ans[q.ref]==='NO').length;
+  const na=qs.filter(q=>ans[q.ref]==='N/A').length;
+  const score=(yes+no)>0?Math.round(yes/(yes+no)*100)+'%':'N/A';
+  const snames=['Safety Audit','Action Plan','NA Exclusions','Summary'];
+
+  const s1=[['TSC CONSOLIDATED SELF-ASSESSMENT'],['Location ID:',uid,'Location:',loc,'Region:',region,'State:',state],['Quarter:',qtr,'Completed By:',by,'Date of Audit:',auditDate],['Active Sections:',[...actSec].join(', ')],[],['#','Ref ID','Section','Audit Question','Criticality','Shift','Answer','Notes','N/A Reason','Additional Comment'],...qs.map(q=>[q.num,q.ref,q.section,q.question,q.criticality,q.shift,ans[q.ref]||'',notes[q.ref]||'',nar[q.ref]||'',naComment[q.ref]||''])];
+  const noItems=qs.filter(q=>ans[q.ref]==='NO');
+  const s2=[['TSC SAFETY AUDIT \u2014 ACTION PLAN'],['Location:',loc,'Region:',region,'Quarter:',qtr],[],['#','Ref ID','Section','Issue / Question','Criticality','Notes / Corrective Action','Status','Resolution Note','Resolved Date'],...noItems.map(q=>{const st=actionStatus[q.ref]||{status:'Open',note:''};return[q.num,q.ref,q.section,q.question,q.criticality,notes[q.ref]||'',st.status,st.note||'',st.resolvedDate||''];})];
+  const naItems=qs.filter(q=>ans[q.ref]==='N/A');
+  const s3=[['TSC SAFETY AUDIT \u2014 N/A EXCLUSIONS'],['Location:',loc,'Quarter:',qtr],[],['#','Ref ID','Section','Question','Criticality','Reason Not Applicable','Additional Comment'],...naItems.map(q=>[q.num,q.ref,q.section,q.question,q.criticality,nar[q.ref]||'',naComment[q.ref]||''])];
+  const s4=[['TSC SAFETY AUDIT \u2014 SUMMARY SCORECARD'],['Location ID:',uid,'Location:',loc],['Region:',region,'State:',state,'Quarter:',qtr,'Completed By:',by],[],['','Total','YES','NO','N/A','Unanswered','Score %'],['OVERALL',qs.length,yes,no,na,qs.length-yes-no-na,score],[],['BY SECTION'],...ALLSEC.filter(s=>actSec.has(s)).map(sec=>{const sq=qs.filter(q=>q.section===sec);const sy=sq.filter(q=>ans[q.ref]==='YES').length,sn=sq.filter(q=>ans[q.ref]==='NO').length,sna=sq.filter(q=>ans[q.ref]==='N/A').length;return[sec,sq.length,sy,sn,sna,sq.length-sy-sn-sna,(sy+sn)>0?Math.round(sy/(sy+sn)*100)+'%':'N/A'];})];
+
+  const wbXml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="'+NSS+'" xmlns:r="'+NSR+'"><sheets>'+snames.map((n,i)=>'<sheet name="'+xesc(n)+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>').join('')+'</sheets></workbook>';
+  const wbRels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="'+NSP+'">'+snames.map((_,i)=>'<Relationship Id="rId'+(i+1)+'" Type="'+NSR+'/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>').join('')+'<Relationship Id="rId'+(snames.length+1)+'" Type="'+NSR+'/styles" Target="styles.xml"/></Relationships>';
+  const pkgRels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="'+NSP+'"><Relationship Id="rId1" Type="'+NSR+'/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  const ct='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="'+NSC+'"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+snames.map((_,i)=>'<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('')+'</Types>';
+
+  const files=[
+    ['[Content_Types].xml',ENC.encode(ct)],
+    ['_rels/.rels',ENC.encode(pkgRels)],
+    ['xl/workbook.xml',ENC.encode(wbXml)],
+    ['xl/_rels/workbook.xml.rels',ENC.encode(wbRels)],
+    ['xl/styles.xml',ENC.encode(stylesXml())],
+    ['xl/worksheets/sheet1.xml',ENC.encode(shXml(s1,true))],
+    ['xl/worksheets/sheet2.xml',ENC.encode(shXml(s2,false))],
+    ['xl/worksheets/sheet3.xml',ENC.encode(shXml(s3,false))],
+    ['xl/worksheets/sheet4.xml',ENC.encode(shXml(s4,true))],
+  ];
+  const zip=buildZip(files);
+  const blob=new Blob([zip],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const locNameForFile=selLoc?selLoc.name.replace(/[^a-zA-Z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40):'';
+  const filename='TSC_Safety_Audit_'+(uid||'Export').replace(/[^a-zA-Z0-9]/g,'_')+(locNameForFile?'_'+locNameForFile:'')+'_'+qtr.replace(/\s/g,'_')+'.xlsx';
+  return {blob,filename};
+}
+
+function doExport(){
+  const {blob,filename}=buildWorkbookBlob();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+}
+
+// ── EMAIL ──
+const RVP_NAMES=[...new Set(LOCATIONS.map(l=>l.rvp).filter(Boolean))].sort();
+function rvpGuessEmail(name){
+  const parts=name.trim().toLowerCase().split(/\s+/);
+  if(parts.length<2)return parts[0]+'@theservicecompanies.com';
+  return parts[0]+'.'+parts[parts.length-1]+'@theservicecompanies.com';
+}
+function populateRvpSelect(){
+  const sel=document.getElementById('rvpSelect');
+  sel.innerHTML='<option value="">— Select Regional VP —</option>'+
+    RVP_NAMES.map(n=>'<option value="'+xH(n)+'">'+xH(n)+'</option>').join('');
+}
+function onRvpSelect(){
+  const sel=document.getElementById('rvpSelect');
+  const emailField=document.getElementById('emailRVP');
+  if(sel.value){
+    emailField.value=rvpGuessEmail(sel.value);
+  } else {
+    emailField.value='';
+  }
+}
+const VP_RISK_SAFETY_EMAIL='corne.wolmarans@theservicecompanies.com';
+const SVP_MANAGED_SERVICES_EMAIL='Patrick.Lavoie@theservicecompanies.com';
+
+function openEmailModal(){
+  populateRvpSelect();
+  const sel=document.getElementById('rvpSelect');
+  if(selLoc&&selLoc.rvp&&RVP_NAMES.includes(selLoc.rvp)){
+    sel.value=selLoc.rvp;
+    onRvpSelect();
+  }
+  document.getElementById('emailModal').classList.add('open');
+}
+function closeEmailModal(){
+  document.getElementById('emailModal').classList.remove('open');
+}
+
+// ── HELP / HOW-TO-USE MODAL ──
+// Two ways to add a real video, whichever fits how you're hosting it:
+// 1. Self-hosted file (recommended — a walkthrough video already exists as
+//    TSC_SelfAssessment_Walkthrough.mp4): upload that file to the SAME GitHub repo as
+//    this index.html, then set HELP_VIDEO_FILE to its filename below.
+// 2. External embed (YouTube "embed" link, Loom share link, etc.): set HELP_VIDEO_URL
+//    instead. Leave HELP_VIDEO_FILE empty if using this option.
+// Whichever one has a value takes over automatically — nothing else needs to change.
+const HELP_VIDEO_FILE='TSC_SelfAssessment_Walkthrough.mp4';
+const HELP_VIDEO_URL='';
+function openHelpModal(){
+  const area=document.getElementById('helpVideoArea');
+  if(HELP_VIDEO_FILE){
+    area.innerHTML='<video src="'+HELP_VIDEO_FILE+'" controls playsinline style="width:100%;max-height:70vh;border-radius:8px;background:#000"></video>';
+    area.style.padding='0';
+    area.style.background='none';
+  } else if(HELP_VIDEO_URL){
+    area.innerHTML='<iframe src="'+HELP_VIDEO_URL+'" style="width:100%;aspect-ratio:16/9;border:none;border-radius:8px" allowfullscreen></iframe>';
+    area.style.padding='0';
+    area.style.background='none';
+  }
+  document.getElementById('helpModal').classList.add('open');
+}
+function closeHelpModal(){
+  document.getElementById('helpModal').classList.remove('open');
+}
+
+function openMailto(url){
+  // Clicking a real <a href="mailto:..."> is more reliably handled by browsers
+  // than reassigning window.location.href, especially when the page itself is
+  // loaded from a file:// origin, where Chrome applies extra navigation restrictions.
+  const a=document.createElement('a');
+  a.href=url;
+  a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function sendEmail(){
+  const rvp=document.getElementById('emailRVP').value.trim();
+  const toEmails=[VP_RISK_SAFETY_EMAIL,rvp].filter(Boolean);
+
+  const qs=activeQs();
+  const yes=qs.filter(q=>ans[q.ref]==='YES').length;
+  const no=qs.filter(q=>ans[q.ref]==='NO').length;
+  const na=qs.filter(q=>ans[q.ref]==='N/A').length;
+  const score=(yes+no)>0?Math.round(yes/(yes+no)*100):0;
+  const qtr=document.getElementById('locqtr').value;
+  const by=document.getElementById('locby').value||'(not entered)';
+  const locName=selLoc?selLoc.name:'(no location selected)';
+  const locId=selLoc?selLoc.id:'';
+
+  const noItems=qs.filter(q=>ans[q.ref]==='NO').sort((a2,b2)=>{
+    const r=c=>c&&c.startsWith('\ud83d\udd34')?0:c&&c.startsWith('\ud83d\udfe0')?1:2;
+    return r(a2.criticality)-r(b2.criticality);
+  });
+  let actionList='';
+  if(noItems.length){
+    actionList='\n\nAction Items for Safety Committee ('+noItems.length+'):\n'+noItems.map(q=>{
+      const st=(actionStatus[q.ref]||{}).status||'Open';
+      return '\u2022 ['+q.ref+'] '+q.question+(notes[q.ref]?' \u2014 '+notes[q.ref]:'')+' [Status: '+st+']';
+    }).join('\n');
+  }
+
+  const subject='TSC Safety Audit — '+locName+' ('+qtr+')'+(finalized?' [FINALIZED]':'');
+  const body=
+'Safety self-assessment '+(finalized?'finalized and ':'')+'completed.\n\n'+
+'Location: ['+locId+'] '+locName+'\n'+
+'Quarter: '+qtr+'\n'+
+'Completed By: '+by+'\n\n'+
+'Compliance Score: '+score+'%\n'+
+'YES: '+yes+'   NO: '+no+'   N/A: '+na+
+actionList+
+'\n\n\u2014\u2014\u2014\nThe completed Excel workbook has been downloaded to this device \u2014 please attach it to this email before sending.';
+
+  const mailto='mailto:'+encodeURIComponent(toEmails.join(','))+
+    '?cc='+encodeURIComponent(SVP_MANAGED_SERVICES_EMAIL)+
+    '&subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  openMailto(mailto);
+  closeEmailModal();
+}
+
+// ── NETWORK STATUS BADGE ──
+// Gives less tech-comfortable managers a simple button instead of needing to know a
+// hard-refresh keyboard shortcut. Explicitly saves first (belt-and-suspenders — the app
+// already auto-saves, but this guarantees nothing is lost from this specific action), then
+// reloads with a cache-busting query param so it actually fetches fresh content rather than
+// potentially reloading the same stale cached version.
+function forceRefresh(){
+  try{ persistState(); }catch(err){}
+  location.href=location.pathname+'?refresh='+Date.now();
+}
+function updateNetStatusBadge(){
+  const el=document.getElementById('netStatusBadge');
+  if(!el)return;
+  if(navigator.onLine){
+    el.textContent='\ud83d\udfe2 Online';
+    el.style.background='#dcfce7'; el.style.color='#15803d';
+  } else {
+    el.textContent='\u26ab Offline';
+    el.style.background='#f1f5f9'; el.style.color='#64748b';
+  }
+}
+window.addEventListener('online', updateNetStatusBadge);
+window.addEventListener('offline', updateNetStatusBadge);
+
+// init
+checkStorageHealthOnLoad();
+updateNetStatusBadge();
+document.getElementById('locdate').value=new Date().toISOString().slice(0,10);
+const _restored=loadPersistedState();
+renderSetup();
+if(_restored && selLoc){
+  document.getElementById('locby').value=_restored.completedBy||'';
+  document.getElementById('locqtr').value=_restored.quarter||'Q3 2026';
+  document.getElementById('locdate').value=_restored.auditDate||new Date().toISOString().slice(0,10);
+  document.getElementById('lcid').textContent=selLoc.id;
+  document.getElementById('lcname').textContent=selLoc.name;
+  document.getElementById('lcmeta').textContent=selLoc.region+' \u00b7 '+selLoc.state+(selLoc.rvp?' \u00b7 RVP: '+selLoc.rvp:'');
+  document.getElementById('lchip').style.display='flex';
+  startAudit();
+}
+</script>
+</body>
+</html>
