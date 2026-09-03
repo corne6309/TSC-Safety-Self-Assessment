@@ -50,6 +50,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .help-section-title{font-size:13px;font-weight:700;color:#0f172a;margin:20px 0 10px;padding-top:14px;border-top:1px solid #f1f5f9}
 .help-section-title:first-child{margin-top:0;padding-top:0;border-top:none}
 .help-tip{background:#fef9c3;border-left:3px solid #eab308;padding:10px 12px;border-radius:6px;font-size:12.5px;color:#713f12;margin-bottom:10px}
+#flowModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:20px}
+#flowModal.open{display:flex}
+.flow-box{background:#fff;border-radius:14px;padding:0;max-width:520px;width:100%;max-height:85vh;box-shadow:0 20px 60px rgba(0,0,0,.3);display:flex;flex-direction:column}
+.flow-header{padding:20px 22px 14px;border-bottom:1.5px solid #e2e8f0;display:flex;justify-content:space-between;align-items:flex-start}
+.flow-header h2{font-size:17px;font-weight:700;color:#0f172a}
+.flow-header .sub{font-size:12.5px;color:#64748b;margin-top:4px}
+.flow-close{background:none;border:none;font-size:22px;color:#94a3b8;cursor:pointer;line-height:1;padding:0 0 0 12px}
+.flow-body{overflow-y:auto;padding:18px 22px 22px}
+.flow-section-title{font-size:12.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.03em;margin:20px 0 12px}
+.flow-section-title:first-child{margin-top:0}
+.flow-step{border-radius:10px;padding:12px 14px;margin-bottom:4px;font-size:13px;font-weight:700}
+.flow-step .fs-sub{font-size:11.5px;font-weight:400;margin-top:2px;opacity:.85}
+.flow-arrow{text-align:center;color:#94a3b8;font-size:16px;line-height:1;padding:2px 0}
+.flow-note{font-size:12px;color:#64748b;text-align:center;margin-top:10px;font-style:italic}
 .email-field{margin-bottom:12px}
 .email-field label{display:block;font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
 .email-field input{width:100%;border:1.5px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
@@ -259,6 +273,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div id="statusRow" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;width:100%;margin-bottom:8px">
         <span id="netStatusBadge" style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:10px;white-space:nowrap"></span>
         <button class="btn btn-slate" onclick="openHelpModal()" style="background:#0e7490">❓ How to Use</button>
+        <button class="btn btn-slate" onclick="openFlowModal()" style="background:#7e22ce">🗺️ Audit Flow</button>
         <button class="btn btn-slate" onclick="forceRefresh()" title="Tap this if the app seems stuck, out of date, or isn't behaving right — it's safe, your progress is already saved">🔄 Refresh</button>
         <span class="pbadge" id="pbadge" style="color:#f59e0b;display:none">0/0</span>
         <span id="saveIndicator" style="font-size:11px;font-weight:700;color:#4ade80;opacity:0;transition:opacity .3s;white-space:nowrap">✓ Saved</span>
@@ -271,7 +286,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="btn" style="background:#0e7490;display:none" id="albtn" onclick="toggleActionList()">📋 Action List</button>
         <button class="btn" style="background:#1e3a8a;display:none" id="finalizebtn" onclick="requestFinalize()">✅ Finalize</button>
         <button class="btn btn-green" id="expbtn" onclick="doExport()" style="display:none" title="Tap this button to send your results — do not use your browser's Print or Save as PDF option, it cannot be read by the tracking system">⬇ Excel (No PDF)</button>
-        <button class="btn btn-purple" id="emailbtn" onclick="openEmailModal()" style="display:none">✉️ Send Audit</button>
+        <button class="btn btn-purple" id="emailbtn" onclick="openEmailModal('audit')" style="display:none">✉️ Send Audit</button>
+        <button class="btn" id="sendactionlistbtn" onclick="requestSendActionList()" style="display:none;background:#7e22ce" title="Send just an Action List status update — for when you've updated statuses after your initial submission">📋 Send Action List</button>
       </div>
       <div id="dangerRow" style="display:flex;width:100%;margin-top:4px">
         <button class="btn btn-amber" id="newbtn" onclick="requestNewAudit()" style="display:none">🔄 New Audit</button>
@@ -423,7 +439,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="help-step"><div class="help-step-num">📋</div><div class="help-step-text"><strong>Action List</strong> — every NO you've answered, in one place, with a status you can update (Open / In Progress / Resolved) as you work through the quarter — even weeks after you finish the assessment itself.</div></div>
       <div class="help-step"><div class="help-step-num">✅</div><div class="help-step-text"><strong>Finalize</strong> — only tap this once you've answered every question and are truly done. It locks your answers in. (You can still unlock it later if you made a mistake.)</div></div>
       <div class="help-step"><div class="help-step-num">⬇</div><div class="help-step-text"><strong>Excel (not Print/PDF)</strong> — tap this after finalizing to download your results as a file. This step comes before Send Audit.</div></div>
-      <div class="help-step"><div class="help-step-num">✉️</div><div class="help-step-text"><strong>Send Audit</strong> — tap this last. It opens an email pre-filled with the right recipients — just attach the file you just downloaded and hit send.</div></div>
+      <div class="help-step"><div class="help-step-num">✉️</div><div class="help-step-text"><strong>Send Audit</strong> — tap this last, for your very first submission. It opens an email pre-filled with the right recipients — just attach the file you just downloaded and hit send.</div></div>
+      <div class="help-step"><div class="help-step-num">📋</div><div class="help-step-text"><strong>Send Action List</strong> — appears once you have action items, but stays greyed out (🔒) until you've sent your initial audit. Use this (not Send Audit) for every update after that first submission — it's clearly labeled for your Regional VP and Risk VP so it's obvious it's an update, not a brand-new submission.</div></div>
       <div class="help-step"><div class="help-step-num">🔄</div><div class="help-step-text"><strong>New Audit</strong> — this is also how you delete/reset the current audit. Use it for starting a genuinely new assessment (like next quarter), or to wipe a mistake and start completely over. Don't tap this if you're just taking a break — your progress is already saved automatically.</div></div>
 
       <div class="help-section-title">📋 The Full Process, Step by Step</div>
@@ -431,9 +448,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>Enter your name and today's date.</strong> The quarter fills in on its own — no need to figure that out yourself.</div></div>
       <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>Check your sections are right.</strong> Most sections are already turned on for you. If your location has vehicles or golf carts, make sure those are switched on too.</div></div>
       <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>Go through each question, whenever you have time.</strong> Tap YES, NO, or N/A for every item. If you tap NO, add a short note about what's wrong. If you tap N/A, add a short reason why it doesn't apply. Stop and come back as many times as you need.</div></div>
-      <div class="help-step"><div class="help-step-num">5</div><div class="help-step-text"><strong>Check your Action List as you go.</strong> Update item statuses throughout the quarter as things get fixed — this doesn't require finishing the assessment first.</div></div>
+      <div class="help-step"><div class="help-step-num">5</div><div class="help-step-text"><strong>Check your Action List as you go.</strong> Update item statuses throughout the quarter as things get fixed — this doesn't require finishing the assessment first. Target timeframes: Critical items in 2 weeks, High in 3 weeks, Medium in 4 weeks from the date you flagged them. A colored badge shows how you're tracking against that.</div></div>
       <div class="help-step"><div class="help-step-num">6</div><div class="help-step-text"><strong>Tap Finalize once every question is answered.</strong> Made a mistake after finalizing? Tap "Unlock to Fix a Mistake" — you can always go back in.</div></div>
       <div class="help-step"><div class="help-step-num">7</div><div class="help-step-text"><strong>Tap Excel, then Send Audit.</strong> Attach the downloaded file to the email that opens, and hit send.</div></div>
+
+      <div class="help-section-title">🔁 Updating Your Action List Later? Resubmit the Same Way</div>
+      <div class="help-step-text" style="margin-bottom:8px">Fixed something after your initial submission? Come back into the app, update the status on your Action List (Open → In Progress → Resolved), then <strong>tap Excel, then tap "📋 Send Action List"</strong> (not Send Audit this time — that's just for your first submission). This works just like a Regional VP follow-up visit: your updated file automatically replaces your prior submission once the Risk VP loads it — nothing gets duplicated, and there's no separate process to learn.</div>
 
       <div class="help-section-title">💡 A Few Extra Tips</div>
       <div class="help-tip">💡 <strong>Never use your browser's Print or Save as PDF button.</strong> Always use the green Excel button — that's the only format that can be tracked properly.</div>
@@ -441,6 +461,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="help-tip">📱 <strong>iPhone users:</strong> the Send Audit button may open Apple's built-in Mail app instead of Outlook. To fix this permanently: go to your iPhone's <strong>Settings → Outlook → Default Mail App</strong> and select Outlook. This is a one-time fix for your whole phone, not just this app.</div>
 
       <div class="help-section-title">🗑️ Need to Delete or Reset an Audit?</div>
+      <div class="help-tip" style="background:#fee2e2;border-left-color:#dc2626;color:#7f1d1d;font-weight:600">🔒 If you have any Action List items still marked <strong>Open</strong>, New Audit and Delete Saved won't work until you've sent your latest Action List update — same as submitting your original audit. This protects your data from being accidentally lost. Items marked "In Progress" don't block this, since those can carry into next quarter.</div>
       <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text">If you're already inside the audit, tap the orange <strong>"🔄 New Audit"</strong> button. If you're on the setup screen with a saved audit showing, tap <strong>"🗑️ Delete Saved"</strong> right next to your location name instead — same result, either way.</div></div>
       <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text">The button changes to <strong>"⚠️ Tap again — [X] lost"</strong>, showing exactly how many answers will be deleted. This is your warning — tap anything else to cancel, or wait a few seconds and it resets on its own.</div></div>
       <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text">Tap the same button again to confirm. Every answer, note, and Action List entry for the current audit is cleared.</div></div>
@@ -451,6 +472,39 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
       <div class="help-section-title">📝 No internet or having trouble with the app?</div>
       <div class="help-step-text" style="margin-bottom:8px">There's a paper-free backup option: a fillable Excel version of this same audit. Ask your Risk VP for the file — pick your location from the dropdown at the top and everything else works the same way, just typed in directly instead of tapped.</div>
+    </div>
+  </div>
+</div>
+
+<div id="flowModal">
+  <div class="flow-box">
+    <div class="flow-header">
+      <div>
+        <h2>🗺️ Audit Flow</h2>
+        <div class="sub">A quick visual overview — see "❓ How to Use" for full step-by-step detail.</div>
+      </div>
+      <button class="flow-close" onclick="closeFlowModal()">✕</button>
+    </div>
+    <div class="flow-body">
+      <div class="flow-section-title">Getting started (once per quarter)</div>
+      <div class="flow-step" style="background:#f1f5f9;color:#334155">1. Pick location &amp; enter info</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step" style="background:#f1f5f9;color:#334155">2. Answer questions<div class="fs-sub">Yes, No, or N/A</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step" style="background:#f1f5f9;color:#334155">3. Finalize<div class="fs-sub">Locks answers, seeds action list</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step" style="background:#ccfbf1;color:#0f766e">4. Excel + Send Audit<div class="fs-sub">Initial submission complete</div></div>
+
+      <div class="flow-section-title">Ongoing (as many times as needed this quarter)</div>
+      <div class="flow-step" style="background:#f1f5f9;color:#334155">Update item to Open<div class="fs-sub">e.g. reopening a finding</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step" style="background:#fee2e2;color:#991b1b">🔒 New Audit &amp; Delete: locked<div class="fs-sub">Protects unsent data</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step" style="background:#f3e8ff;color:#6b21a8">Send Action List<div class="fs-sub">Same recipients as original audit</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step" style="background:#ccfbf1;color:#0f766e">✅ New Audit &amp; Delete: unlocked<div class="fs-sub">Ready for next quarter</div></div>
+
+      <div class="flow-note">"In Progress" items never lock this — only "Open" ones</div>
     </div>
   </div>
 </div>
@@ -507,6 +561,14 @@ function isQCollapsedByRef(ref){
 }
 const actionStatus={}; // ref -> {status:'Open'|'In Progress'|'Resolved', note:string}
 let finalized=false;
+// Tracks whether the CURRENT action list state has been emailed since it last changed —
+// used to guard against wiping unsent "Open" items via New Audit. Set true when Send
+// Audit's "Open Email" is tapped; reset false the moment any status changes afterward.
+let actionListSentSinceChange=false;
+// Tracks whether the initial full audit has EVER been sent via Send Audit — Send Action
+// List stays greyed out until this is true, so a manager can't accidentally send an
+// "update" for an audit the Risk VP has never actually received yet.
+let initialAuditSent=false;
 let selLoc=null, actSec=new Set(CORE), sf='All', stf='All';
 const openS=new Set(ALLSEC);
 let flocs=[...LOCATIONS], hli=-1, inSum=false;
@@ -523,6 +585,8 @@ function snapshotState(){
     ans:{...ans}, notes:{...notes}, nar:{...nar}, naComment:{...naComment},
     actionStatus:JSON.parse(JSON.stringify(actionStatus)),
     finalized,
+    actionListSentSinceChange,
+    initialAuditSent,
     completedBy:document.getElementById('locby')?.value||'',
     quarter:document.getElementById('locqtr')?.value||'',
     auditDate:document.getElementById('locdate')?.value||''
@@ -563,6 +627,10 @@ function loadPersistedState(){
     if(data.naComment) Object.assign(naComment,data.naComment);
     if(data.actionStatus) Object.assign(actionStatus,data.actionStatus);
     finalized=!!data.finalized;
+    // Defaults to false (safer) for older saved sessions that predate this flag — they'll
+    // just need one Send Audit tap to clear it, same as anyone else with unsent changes.
+    actionListSentSinceChange=!!data.actionListSentSinceChange;
+    initialAuditSent=!!data.initialAuditSent;
     return data;
   }catch(err){
     console.warn('Could not load saved audit:', err);
@@ -633,6 +701,7 @@ function pickLoc(i){
   document.getElementById('lcmeta').textContent=selLoc.region+' \u00b7 '+selLoc.state+(selLoc.rvp?' \u00b7 RVP: '+selLoc.rvp:'');
   document.getElementById('lchip').style.display='flex';
   document.getElementById('deleteSavedBtn').style.display=Object.keys(ans).length>0?'':'none';
+  updateNewAuditBlockAppearance();
   actSec=new Set(CORE);
   OPT.forEach(s=>{if(selLoc.sections[s])actSec.add(s);});
   renderSetup();updateStartBtn();
@@ -648,8 +717,55 @@ function clearLoc(){
 }
 let pendingDeleteSaved=false;
 let deleteSavedResetTimer=null;
+// Shared visual state for both New Audit and Delete Saved — greyed out proactively
+// whenever they'd actually be blocked, rather than only revealing this after a tap.
+// Called anywhere actionStatus or actionListSentSinceChange can change.
+function isNewAuditBlocked(){
+  const openCount=Object.values(actionStatus).filter(a=>a.status==='Open').length;
+  return openCount>0 && !actionListSentSinceChange;
+}
+function updateNewAuditBlockAppearance(){
+  const blocked=isNewAuditBlocked();
+  const newBtn=document.getElementById('newbtn');
+  if(newBtn && !pendingNewAudit){
+    if(blocked){
+      newBtn.textContent='🔒 New Audit';
+      newBtn.style.background='#94a3b8';
+      newBtn.style.cursor='not-allowed';
+      newBtn.title='Send your Action List update first — tap for details';
+    } else {
+      newBtn.textContent='🔄 New Audit';
+      newBtn.style.background='';
+      newBtn.style.cursor='';
+      newBtn.title='';
+    }
+  }
+  const delBtn=document.getElementById('deleteSavedBtn');
+  if(delBtn && !pendingDeleteSaved && delBtn.style.display!=='none'){
+    if(blocked){
+      delBtn.textContent='🔒 Delete Saved';
+      delBtn.style.background='#94a3b8';
+      delBtn.style.color='#1e293b';
+      delBtn.style.cursor='not-allowed';
+      delBtn.title='Send your Action List update first — tap for details';
+    } else {
+      delBtn.textContent='🗑️ Delete Saved';
+      delBtn.style.background='#fee2e2';
+      delBtn.style.color='#b91c1c';
+      delBtn.style.cursor='';
+      delBtn.title='';
+    }
+  }
+}
 function requestDeleteSaved(){
   const btn=document.getElementById('deleteSavedBtn');
+  // Same hard block as requestNewAudit — this is a second path to the same wipe, so it
+  // needs the same protection or a manager could bypass the block via this button instead.
+  const openCount=Object.values(actionStatus).filter(a=>a.status==='Open').length;
+  if(openCount>0 && !actionListSentSinceChange){
+    alert('⚠️ You have '+openCount+' Open action item'+(openCount===1?'':'s')+' that hasn\'t been sent yet.\n\nRe-enter this audit and tap "📋 Send Action List" (or "✉️ Send Audit" if you haven\'t submitted at all yet) to email your latest update first. Once that\'s sent, deleting will be available.\n\n("In Progress" items don\'t block this — only ones still marked Open.)');
+    return;
+  }
   if(!pendingDeleteSaved){
     const n=Object.keys(ans).length;
     pendingDeleteSaved=true;
@@ -692,12 +808,44 @@ function updateStartBtn(){
 }
 
 // ── START / BACK / NEW ──
+function updateSendActionListBtnVisibility(){
+  const btn=document.getElementById('sendactionlistbtn');
+  if(!btn)return;
+  btn.style.display=Object.keys(actionStatus).length>0?'':'none';
+}
+// Greys out Send Action List until the initial full audit has actually been sent —
+// prevents a manager from sending an "update" for an audit the Risk VP never received.
+function updateSendActionListBlockAppearance(){
+  const btn=document.getElementById('sendactionlistbtn');
+  if(!btn || btn.style.display==='none')return;
+  if(!initialAuditSent){
+    btn.textContent='🔒 Send Action List';
+    btn.style.background='#94a3b8';
+    btn.style.cursor='not-allowed';
+    btn.title='Send your initial audit first (✉️ Send Audit) — tap for details';
+  } else {
+    btn.textContent='📋 Send Action List';
+    btn.style.background='#7e22ce';
+    btn.style.cursor='';
+    btn.title='Send just an Action List status update — for when you\'ve updated statuses after your initial submission';
+  }
+}
+function requestSendActionList(){
+  if(!initialAuditSent){
+    alert('⚠️ You need to send your initial audit first.\n\nTap "✉️ Send Audit" to submit your completed assessment to your Regional VP and Risk VP. Once that\'s sent, "📋 Send Action List" will be available for future status updates.');
+    return;
+  }
+  openEmailModal('actionlist');
+}
 function startAudit(){
   document.getElementById('setup-screen').style.display='none';
   document.getElementById('audit-screen').style.display='block';
   ['pbadge','savebtn','sumbtn','albtn','expbtn','emailbtn','finalizebtn','newbtn','hloc','progress-wrap'].forEach(id=>{
     document.getElementById(id).style.display='';
   });
+  updateSendActionListBtnVisibility();
+  updateNewAuditBlockAppearance();
+  updateSendActionListBlockAppearance();
   document.getElementById('hloctext').innerHTML=
     '<span style="background:#1e3a8a;color:#bfdbfe;padding:1px 7px;border-radius:4px;font-weight:700;font-size:11px;margin-right:5px">'+xH(selLoc.id)+'</span>'
     +'<strong style="color:#e2e8f0">'+xH(selLoc.name)+'</strong>'
@@ -714,12 +862,22 @@ function backToSetup(){
     document.getElementById(id).style.display='none';
   });
   document.getElementById('deleteSavedBtn').style.display=Object.keys(ans).length>0?'':'none';
+  updateNewAuditBlockAppearance();
   updateStartBtn();
 }
 let pendingNewAudit=false;
 let newAuditResetTimer=null;
 function requestNewAudit(){
   const btn=document.getElementById('newbtn');
+  // Hard block: refuse to even arm the delete/reset flow if there are still "Open" action
+  // items that haven't been sent since their last change. "In Progress" items don't block —
+  // those can legitimately carry into next quarter. This exists specifically to prevent a
+  // manager from accidentally wiping unresolved, unsent findings.
+  const openCount=Object.values(actionStatus).filter(a=>a.status==='Open').length;
+  if(openCount>0 && !actionListSentSinceChange){
+    alert('⚠️ You have '+openCount+' Open action item'+(openCount===1?'':'s')+' that hasn\'t been sent yet.\n\nTap "📋 Send Action List" (or "✉️ Send Audit" if you haven\'t submitted at all yet) to email your latest update to your Regional VP and Risk VP first. Once that\'s sent, New Audit will be available.\n\n("In Progress" items don\'t block this — only ones still marked Open.)');
+    return;
+  }
   if(!pendingNewAudit){
     const n=Object.keys(ans).length;
     pendingNewAudit=true;
@@ -751,6 +909,7 @@ function newAudit(){
   Object.keys(naComment).forEach(k=>delete naComment[k]);
   Object.keys(actionStatus).forEach(k=>delete actionStatus[k]);
   finalized=false;
+  actionListSentSinceChange=true; // nothing left to send after a genuine fresh start
   sf='All';stf='All';inSum=false;
   document.getElementById('locdate').value=new Date().toISOString().slice(0,10);
   document.getElementById('locby').value='';
@@ -949,6 +1108,9 @@ function confirmFinalize(){
   activeQs().filter(q=>ans[q.ref]==='NO').forEach(q=>{
     if(!actionStatus[q.ref]) actionStatus[q.ref]={status:'Open',note:''};
   });
+  updateSendActionListBtnVisibility();
+  updateNewAuditBlockAppearance();
+  updateSendActionListBlockAppearance();
   persistState();
   updateFinalizedUI();
   render();
@@ -1079,6 +1241,7 @@ function renderActionList(){
 function setActionStatus(ref,status){
   if(!actionStatus[ref]) actionStatus[ref]={status:'Open',note:''};
   actionStatus[ref].status=status;
+  actionListSentSinceChange=false; // any change makes the last-sent snapshot stale
   // Capture the actual date resolved — this is what makes a real lag-to-closure metric
   // possible later, not just "is it currently overdue". If reopened and resolved again,
   // the date resets — the most recent resolution is what actually matters for how long
@@ -1090,6 +1253,7 @@ function setActionStatus(ref,status){
     delete actionStatus[ref].resolvedDate;
   }
   persistState();
+  updateNewAuditBlockAppearance();
   // Deferred, not immediate: renderActionList() re-sorts by status and rebuilds this
   // exact <select> element — doing that synchronously, inside the element's own onchange
   // handler, can interrupt the browser mid-interaction (especially on mobile) and cause
@@ -1099,7 +1263,9 @@ function setActionStatus(ref,status){
 function setActionNote(ref,note){
   if(!actionStatus[ref]) actionStatus[ref]={status:'Open',note:''};
   actionStatus[ref].note=note;
+  actionListSentSinceChange=false;
   persistState();
+  updateNewAuditBlockAppearance();
 }
 
 // ── SUMMARY ──
@@ -1318,7 +1484,18 @@ function onRvpSelect(){
 const VP_RISK_SAFETY_EMAIL='corne.wolmarans@theservicecompanies.com';
 const SVP_MANAGED_SERVICES_EMAIL='Patrick.Lavoie@theservicecompanies.com';
 
-function openEmailModal(){
+let emailMode='audit'; // 'audit' (initial/full submission) or 'actionlist' (status-only update)
+function openEmailModal(mode){
+  emailMode=mode||'audit';
+  const titleEl=document.querySelector('.email-box h2');
+  const subEl=document.querySelector('.email-box .sub');
+  if(emailMode==='actionlist'){
+    if(titleEl) titleEl.textContent='📋 Send Action List Update';
+    if(subEl) subEl.textContent='Sends just your current Action List status — same recipients as your original audit. Use this whenever you\'ve updated statuses since your last submission.';
+  } else {
+    if(titleEl) titleEl.textContent='✉️ Send Completed Audit';
+    if(subEl) subEl.textContent='Always sends to VP of Risk & Safety and SVP Managed Services, plus the Regional VP below — includes score and action items.';
+  }
   populateRvpSelect();
   const sel=document.getElementById('rvpSelect');
   if(selLoc&&selLoc.rvp&&RVP_NAMES.includes(selLoc.rvp)){
@@ -1372,6 +1549,12 @@ function openHelpModal(){
 function closeHelpModal(){
   document.getElementById('helpModal').classList.remove('open');
 }
+function openFlowModal(){
+  document.getElementById('flowModal').classList.add('open');
+}
+function closeFlowModal(){
+  document.getElementById('flowModal').classList.remove('open');
+}
 
 function openMailto(url){
   // Clicking a real <a href="mailto:..."> is more reliably handled by browsers
@@ -1388,6 +1571,14 @@ function openMailto(url){
 function sendEmail(){
   const rvp=document.getElementById('emailRVP').value.trim();
   const toEmails=[VP_RISK_SAFETY_EMAIL,rvp].filter(Boolean);
+  // Tapping through to actually open the email counts as "sent" for the purposes of the
+  // New Audit safeguard — same trust level as the initial submission, which has always
+  // worked this way (the app can't verify the email was actually sent either way).
+  actionListSentSinceChange=true;
+  if(emailMode==='audit') initialAuditSent=true;
+  persistState();
+  updateNewAuditBlockAppearance();
+  updateSendActionListBlockAppearance();
 
   const qs=activeQs();
   const yes=qs.filter(q=>ans[q.ref]==='YES').length;
@@ -1411,16 +1602,24 @@ function sendEmail(){
     }).join('\n');
   }
 
-  const subject='TSC Safety Audit — '+locName+' ('+qtr+')'+(finalized?' [FINALIZED]':'');
-  const body=
-'Safety self-assessment '+(finalized?'finalized and ':'')+'completed.\n\n'+
-'Location: ['+locId+'] '+locName+'\n'+
-'Quarter: '+qtr+'\n'+
-'Completed By: '+by+'\n\n'+
-'Compliance Score: '+score+'%\n'+
-'YES: '+yes+'   NO: '+no+'   N/A: '+na+
-actionList+
-'\n\n\u2014\u2014\u2014\nThe completed Excel workbook has been downloaded to this device \u2014 please attach it to this email before sending.';
+  const subject=(emailMode==='actionlist'
+      ? 'TSC Action List Update \u2014 '+locName+' ('+qtr+')'
+      : 'TSC Safety Audit \u2014 '+locName+' ('+qtr+')'+(finalized?' [FINALIZED]':''));
+  const body=(emailMode==='actionlist'
+      ? 'Action List status update for a previously submitted safety self-assessment.\n\n'+
+        'Location: ['+locId+'] '+locName+'\n'+
+        'Quarter: '+qtr+'\n'+
+        'Completed By: '+by+'\n'+
+        actionList+
+        '\n\n\u2014\u2014\u2014\nThe completed Excel workbook has been downloaded to this device \u2014 please attach it to this email before sending. This replaces the Action List status from the prior submission; the original audit answers and score are unchanged.'
+      : 'Safety self-assessment '+(finalized?'finalized and ':'')+'completed.\n\n'+
+        'Location: ['+locId+'] '+locName+'\n'+
+        'Quarter: '+qtr+'\n'+
+        'Completed By: '+by+'\n\n'+
+        'Compliance Score: '+score+'%\n'+
+        'YES: '+yes+'   NO: '+no+'   N/A: '+na+
+        actionList+
+        '\n\n\u2014\u2014\u2014\nThe completed Excel workbook has been downloaded to this device \u2014 please attach it to this email before sending.');
 
   const mailto='mailto:'+encodeURIComponent(toEmails.join(','))+
     '?cc='+encodeURIComponent(SVP_MANAGED_SERVICES_EMAIL)+
