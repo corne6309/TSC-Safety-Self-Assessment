@@ -1288,7 +1288,7 @@ function renderSum(){
   const na=qs.filter(q=>ans[q.ref]==='N/A').length;
   const answered=yes+no+na,tot=qs.length;
   const score=(yes+no)>0?Math.round(yes/(yes+no)*100):0;
-  const sc=score>=90?'#4ade80':score>=70?'#fbbf24':'#f87171';
+  const sc=score>=90?'#4ade80':score>=85?'#fbbf24':'#f87171';
   const by=document.getElementById('locby').value;
   const qtr=document.getElementById('locqtr').value;
   document.getElementById('sumhero').innerHTML=
