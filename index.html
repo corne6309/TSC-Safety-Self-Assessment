@@ -77,6 +77,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* SETUP */
 #setup-screen{max-width:600px;margin:28px auto;padding:0 12px 60px}
 .scard{background:#fff;border-radius:14px;padding:20px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+
+.gate{border-radius:14px;padding:16px 20px;margin-bottom:12px;border:2px solid;font-size:13.5px;line-height:1.55}
+.gate h2{font-size:16px;margin-bottom:6px}
+.gate p{margin:6px 0}
+.gate.ok{background:#f0fdf4;border-color:#86efac;color:#14532d}
+.gate.info{background:#eff6ff;border-color:#93c5fd;color:#1e3a8a}
+.gate.warn{background:#fffbeb;border-color:#fcd34d;color:#78350f}
+.gate.block{background:#fef2f2;border-color:#fca5a5;color:#7f1d1d}
+.gate-list{margin:8px 0 4px;padding:0;list-style:none}
+.gate-list li{padding:6px 0;border-top:1px solid rgba(0,0,0,.08);font-size:12.5px}
+.gate-badge{display:inline-block;font-size:10.5px;font-weight:800;border-radius:10px;padding:1px 8px;margin-left:6px;background:#fee2e2;color:#b91c1c}
+.gate-meta{font-size:11.5px;opacity:.85}
+.gate-btn{border:none;border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;background:#1e3a8a;color:#fff}
+.gate-btn.alt{background:#fff;color:#334155;border:1.5px solid #cbd5e1}
 .scard h2{font-size:15px;font-weight:700;color:#0f172a;margin-bottom:3px}
 .scard .sub{font-size:12px;color:#64748b;margin-bottom:14px}
 
@@ -334,6 +348,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="mfield" style="max-width:150px"><label for="locdate">Date of Audit</label><input type="date" id="locdate"></div>
     </div>
   </div>
+  <div id="gateCard" class="gate" style="display:none"></div>
   <div class="scard">
     <h2>📋 Audit Sections</h2>
     <div class="sub">Core sections always included. Optional sections pre-set from your location data — toggle to adjust.</div>
@@ -433,6 +448,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
 
       <div class="help-tip" style="background:#dbeafe;border-left-color:#1e3a8a;color:#1e3a8a;font-weight:600">🗓️ <strong>You do NOT have to finish this in one sitting.</strong> You have the entire quarter to complete it. Answer a few questions, tap "💾 Save Now" (or just close the app — it saves automatically), and come back whenever you have time. Nothing is lost.</div>
+      <div class="help-tip" style="background:#fef3c7;border-left-color:#d97706;color:#78350f">📌 <strong>When you can start.</strong> Quarters are completed in order (Q3 before Q4), at least <strong>45 days</strong> must pass between one finalized assessment and the next, and any <strong>Critical or High</strong> action item past its due date has to be marked Resolved first. When you pick your location the app checks all three, tells you exactly what's needed and the earliest date you can start, and sets the quarter for you.</div>
 
       <div class="help-section-title">🔘 What Each Button Does, In Order</div>
       <div class="help-step"><div class="help-step-num">💾</div><div class="help-step-text"><strong>Save Now</strong> — saves your progress right now. You don't need this often (it auto-saves as you go), but it's there for peace of mind.</div></div>
@@ -488,7 +504,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
     <div class="flow-body">
       <div class="flow-section-title">Getting started (once per quarter)</div>
-      <div class="flow-step" style="background:#f1f5f9;color:#334155">1. Pick location &amp; enter info</div>
+      <div class="flow-step" style="background:#f1f5f9;color:#334155">1. Pick your location<div class="fs-sub">Eligibility check runs &amp; the quarter is set for you</div></div>
       <div class="flow-arrow">↓</div>
       <div class="flow-step" style="background:#f1f5f9;color:#334155">2. Answer questions<div class="fs-sub">Yes, No, or N/A</div></div>
       <div class="flow-arrow">↓</div>
@@ -587,6 +603,9 @@ let actionListSentSinceChange=false;
 let initialAuditSent=false;
 let selLoc=null, actSec=new Set(CORE), sf='All', stf='All';
 const openS=new Set(ALLSEC);
+let finalizedOn='';   // YYYY-MM-DD this assessment was first finalized on this device
+let gateReceipt=null; // {priorQuarter, priorFinalizedOn, status} — written into the export
+let ansOwnerId=null;  // which location the answers held on this device belong to
 let flocs=[...LOCATIONS], hli=-1, inSum=false;
 
 // ── PERSISTENCE (auto-save + manual save, verified write-then-read-back) ──
@@ -601,6 +620,9 @@ function snapshotState(){
     ans:{...ans}, notes:{...notes}, nar:{...nar}, naComment:{...naComment},
     actionStatus:JSON.parse(JSON.stringify(actionStatus)),
     finalized,
+    finalizedOn,
+    gateReceipt,
+    ansOwnerId,
     actionListSentSinceChange,
     initialAuditSent,
     completedBy:document.getElementById('locby')?.value||'',
@@ -643,6 +665,9 @@ function loadPersistedState(){
     if(data.naComment) Object.assign(naComment,data.naComment);
     if(data.actionStatus) Object.assign(actionStatus,data.actionStatus);
     finalized=!!data.finalized;
+    finalizedOn=data.finalizedOn||'';
+    gateReceipt=data.gateReceipt||null;
+    ansOwnerId=data.ansOwnerId||data.selLocId||null;
     // Defaults to false (safer) for older saved sessions that predate this flag — they'll
     // just need one Send Audit tap to clear it, same as anyone else with unsent changes.
     actionListSentSinceChange=!!data.actionListSentSinceChange;
@@ -721,8 +746,12 @@ function pickLoc(i){
   actSec=new Set(CORE);
   OPT.forEach(s=>{if(selLoc.sections[s])actSec.add(s);});
   renderSetup();updateStartBtn();
+  // Resuming work already on this device skips the check; anything new goes through it.
+  if(Object.keys(ans).length>0 && ansOwnerId===selLoc.id){ gateToken++; gateState=null; renderGateCard(); unlockQuarter(); updateStartBtn(); }
+  else runGate();
 }
 function clearLoc(){
+  gateToken++; gateState=null; renderGateCard(); unlockQuarter();
   selLoc=null;
   document.getElementById('lchip').style.display='none';
   document.getElementById('ls').value='';
@@ -782,6 +811,8 @@ function requestDeleteSaved(){
     alert('⚠️ You have '+openCount+' Open action item'+(openCount===1?'':'s')+' that hasn\'t been sent yet.\n\nRe-enter this audit and tap "📋 Send Action List" (or "✉️ Send Audit" if you haven\'t submitted at all yet) to email your latest update first. Once that\'s sent, deleting will be available.\n\n("In Progress" items don\'t block this — only ones still marked Open.)');
     return;
   }
+  const wipeMsg=wipeBlockedMessage();
+  if(wipeMsg){ alert(wipeMsg); return; }
   if(!pendingDeleteSaved){
     const n=Object.keys(ans).length;
     pendingDeleteSaved=true;
@@ -817,10 +848,348 @@ function toggleSS(s){actSec.has(s)?actSec.delete(s):actSec.add(s);renderSetup();
 function updateStartBtn(){
   const btn=document.getElementById('startbtn');
   if(selLoc){
+    if(gateState&&gateState.checking){btn.disabled=true;btn.textContent='Checking your records\u2026';return;}
+    if(gateState&&gateState.blocked){btn.disabled=true;btn.textContent='Not available yet \u2014 see the message above';return;}
     const tot=[...actSec].reduce((s,k)=>s+(SQCOUNT[k]||0),0);
     btn.disabled=false;
-    btn.textContent='Start Audit \u2014 '+tot+' questions \u2192';
+    const label=(gateState&&gateState.target)?('Start '+gateState.target+(gateState.late?' (late)':'')+' Self-Assessment'):'Start Audit';
+    btn.textContent=label+' \u2014 '+tot+' questions \u2192';
   } else {btn.disabled=true;btn.textContent='Select a location to begin \u2192';}
+}
+
+// ── ELIGIBILITY GATE ─────────────────────────────────────────────────────────
+// Three rules decide whether a location can open its next self-assessment:
+//   1. Quarters are completed in order — Q4 can't open until Q3 is done.
+//   2. At least MIN_DAYS_BETWEEN days between one finalized assessment and the next.
+//   3. Critical/High action items past their due date must be Resolved first.
+// This page is static, so it's guidance rather than a lock a determined person couldn't
+// get around — which is why every export also carries a "gate receipt" that the Tracking
+// Dashboard checks when the file is loaded.
+const MIN_DAYS_BETWEEN=45;
+const PROGRAM_FIRST_QUARTER='Q3 2026';
+// A quarter closes at quarter-end unless a different cutoff was agreed. Q3 2026 was
+// finalized on the agreed Monday-night cutoff; anything finalized after that is "late".
+const QUARTER_CUTOFFS={'Q3 2026':'2026-10-05'};
+// A target for finishing a quarter that's already closed — deliberately earlier than the last
+// possible day, so there's room for the 45-day wait and the next quarter's assessment.
+const RECOMMENDED_FINISH_BY={'Q3 2026':'2026-10-31'};
+const PUBLISHED_BASE='https://corne6309.github.io/TSC-Safety-Leadership-Dashboard/';
+const PUBLISHED_DATA_URL=PUBLISHED_BASE+'dashboard_data.json';
+const GATE_OVERRIDES_URL=PUBLISHED_BASE+'gate_overrides.json';
+const HISTORY_KEY='tsc_self_assessment_history_v1';
+
+let gateState=null;     // null = no gate applied (e.g. resuming an assessment already on this device)
+let gateToken=0;        // guards against a slow check finishing after the manager picked someone else
+let publishedData=null, publishedStatus='pending', gateOverrides={};
+
+// ── dates & quarters (day-level, kept as YYYY-MM-DD strings to avoid timezone drift) ──
+function localISODay(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function todayISO(){return localISODay(new Date());}
+// Accepts ISO dates, M/D/YYYY, and Excel serial numbers (a date cell re-saved in Excel
+// arrives as a number like 46289) — all normalized to YYYY-MM-DD.
+function toISODay(v){
+  if(v==null||v==='') return '';
+  if(v instanceof Date) return isNaN(v.getTime())?'':localISODay(v);
+  const s=String(v).trim();
+  if(/^\d{5}(\.\d+)?$/.test(s)){
+    const n=parseFloat(s);
+    if(n>20000&&n<80000) return new Date(Date.UTC(1899,11,30)+Math.floor(n)*86400000).toISOString().slice(0,10);
+  }
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
+  const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);
+  if(m) return m[3]+'-'+m[1].padStart(2,'0')+'-'+m[2].padStart(2,'0');
+  const d=new Date(s);
+  return isNaN(d.getTime())?'':localISODay(d);
+}
+function addDaysISO(iso,n){const d=new Date(iso+'T00:00:00');d.setDate(d.getDate()+n);return localISODay(d);}
+function diffDaysISO(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
+function fmtDay(iso,withWeekday){
+  const d=new Date(iso+'T00:00:00');
+  return d.toLocaleDateString('en-US',withWeekday?{weekday:'long',month:'long',day:'numeric',year:'numeric'}:{month:'short',day:'numeric',year:'numeric'});
+}
+function qParts(q){const m=/Q(\d)\s*(\d{4})/.exec(q||'');return m?{q:+m[1],y:+m[2]}:null;}
+function qKey(q){const p=qParts(q);return p?p.y*10+p.q:0;}
+function qNext(q){const p=qParts(q);return p.q===4?('Q1 '+(p.y+1)):('Q'+(p.q+1)+' '+p.y);}
+function quarterOfISO(iso){const parts=iso.split('-').map(Number);return 'Q'+Math.ceil(parts[1]/3)+' '+parts[0];}
+function qStartISO(q){const p=qParts(q);return p.y+'-'+String((p.q-1)*3+1).padStart(2,'0')+'-01';}
+function qEndISO(q){const p=qParts(q);return localISODay(new Date(p.y,p.q*3,0));}
+function qRange(from,to){const out=[];let q=from,guard=0;while(qKey(q)<=qKey(to)&&guard++<40){out.push(q);q=qNext(q);}return out;}
+function quarterCutoffISO(q){return QUARTER_CUTOFFS[q]||qEndISO(q);}
+
+// ── data sources: published records (cross-device) + this device's own history ──
+// Start fetching immediately so the check is usually instant by the time a location is
+// picked. Both files are optional in the sense that a failure never blocks the app.
+const publishedPromise=(async function(){
+  const get=async function(url,ms){
+    const ctl=new AbortController();const t=setTimeout(function(){ctl.abort();},ms);
+    try{
+      const r=await fetch(url+'?t='+Date.now(),{cache:'no-store',signal:ctl.signal});
+      if(!r.ok) throw new Error('http '+r.status);
+      return await r.json();
+    } finally { clearTimeout(t); }
+  };
+  try{
+    const d=await get(PUBLISHED_DATA_URL,7000);
+    if(!d||!Array.isArray(d.submissions)) throw new Error('unexpected shape');
+    publishedData=d;publishedStatus='ok';
+  }catch(err){ publishedStatus='failed'; console.warn('Could not load published records:',err); }
+  try{
+    const o=await get(GATE_OVERRIDES_URL,4000);
+    if(o&&typeof o==='object') gateOverrides=o;
+  }catch(err){ /* no exceptions file published — the normal case */ }
+})();
+
+function loadHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'{}')||{};}catch(e){return {};}}
+function saveHistory(h){try{localStorage.setItem(HISTORY_KEY,JSON.stringify(h));}catch(e){}}
+
+function levelForRef(ref,fallbackCrit){
+  // The question bank is the source of truth for severity — older published records have
+  // blank criticality, so look the ref up rather than trusting the stored string.
+  const q=QUESTIONS.find(function(x){return x.ref===ref;});
+  return slaLevelFromCriticality(q?q.criticality:fallbackCrit);
+}
+function mkPublishedAction(a,s,auditDay,resolved){
+  const level=levelForRef(a.ref,a.criticality);
+  const flagged=toISODay(a.flaggedDate)||auditDay;
+  const due=toISODay(a.dueDate)||((level&&flagged)?addDaysISO(flagged,SLA_DAYS[level]):'');
+  return {ref:a.ref,question:a.question||'',level:level,dueDate:due,
+    status:resolved?'Resolved':(a.status==='In Progress'?'In Progress':'Open'),resolved:resolved,quarter:s.quarter};
+}
+function recordsForLocation(locId){
+  const recs=[];
+  if(publishedData){
+    publishedData.submissions.filter(function(s){return s.unitId===locId&&s.sourceTool==='Self-Assessment';}).forEach(function(s){
+      const auditDay=toISODay(s.auditDate);
+      const fin=toISODay(s.finalizedOn||s.finalizedAt)||auditDay;
+      const acts=[];
+      (s.actions||[]).forEach(function(a){acts.push(mkPublishedAction(a,s,auditDay,false));});
+      (s.resolvedActions||[]).forEach(function(a){acts.push(mkPublishedAction(a,s,auditDay,true));});
+      recs.push({quarter:s.quarter,finalizedOn:fin,approx:!(s.finalizedOn||s.finalizedAt),late:!!s.late,actions:acts});
+    });
+  }
+  (loadHistory()[locId]||[]).forEach(function(r){
+    recs.push({quarter:r.quarter,finalizedOn:r.finalizedOn,approx:false,late:!!r.late,
+      actions:(r.actions||[]).map(function(a){return {ref:a.ref,question:a.question||'',level:a.level,dueDate:a.dueDate||'',
+        status:a.status||'Open',resolved:a.status==='Resolved',quarter:r.quarter};})});
+  });
+  return recs;
+}
+function activeOverride(locId,today){
+  const o=gateOverrides&&gateOverrides[locId];
+  if(!o||typeof o!=='object') return null;
+  if(o.expires&&today>o.expires) return null;
+  if(!Array.isArray(o.waive)||!o.waive.length) return null;
+  return o;
+}
+
+// ── the decision (pure — everything it needs is passed in) ──
+function evaluateGate(loc,recs,today,ov){
+  const waive=new Set((ov&&ov.waive)||[]);
+  const curQ=quarterOfISO(today);
+  const firstQ=(loc.activeSince&&qKey(loc.activeSince)>qKey(PROGRAM_FIRST_QUARTER))?loc.activeSince:PROGRAM_FIRST_QUARTER;
+  const g={today:today,curQ:curQ,firstQ:firstQ,target:null,alreadyComplete:false,notYetActive:false,redirected:false,
+    late:false,willBeLate:false,finishBy:'',lastDayForNext:'',lastFinal:'',lastQuarter:'',lastApprox:false,eligibleOn:'',daysLeft:0,tooSoon:false,
+    overdue:[],openItems:[],nextOpens:'',blocked:false};
+  if(qKey(firstQ)>qKey(curQ)){g.notYetActive=true;g.blocked=true;g.nextOpens=qStartISO(firstQ);return g;}
+
+  const done=new Set(recs.map(function(r){return r.quarter;}));
+  const range=qRange(firstQ,curQ);
+  for(let i=0;i<range.length;i++){ if(!done.has(range[i])){g.target=range[i];break;} }
+  if(waive.has('order')&&g.target&&qKey(g.target)<qKey(curQ)) g.target=done.has(curQ)?null:curQ;
+
+  const finals=recs.filter(function(r){return r.finalizedOn;}).sort(function(a,b){return a.finalizedOn<b.finalizedOn?-1:1;});
+  if(finals.length){
+    const last=finals[finals.length-1];
+    g.lastFinal=last.finalizedOn;g.lastQuarter=last.quarter;g.lastApprox=!!last.approx;
+    g.eligibleOn=addDaysISO(g.lastFinal,MIN_DAYS_BETWEEN);
+    if(!waive.has('days')){g.daysLeft=diffDaysISO(today,g.eligibleOn);g.tooSoon=g.daysLeft>0;}
+  }
+
+  // Unresolved Critical/High items across every prior assessment. If any source says an
+  // item is Resolved, it counts as Resolved — resolution is the one-way direction.
+  const items=new Map();
+  recs.forEach(function(r){r.actions.forEach(function(a){
+    const k=(a.quarter||r.quarter)+'|'+a.ref;
+    const prev=items.get(k);
+    if(!prev||(a.resolved&&!prev.resolved)) items.set(k,a);
+  });});
+  g.openItems=[...items.values()]
+    .filter(function(a){return !a.resolved&&(a.level==='CRITICAL'||a.level==='HIGH');})
+    .sort(function(a,b){return (a.dueDate||'9999')<(b.dueDate||'9999')?-1:1;});
+  if(!waive.has('actions')) g.overdue=g.openItems.filter(function(a){return a.dueDate&&a.dueDate<today;});
+
+  if(g.target){
+    const cutoff=quarterCutoffISO(g.target);
+    g.late=today>cutoff;
+    g.willBeLate=g.tooSoon&&g.eligibleOn>cutoff;
+    g.redirected=qKey(g.target)<qKey(curQ);
+    g.finishBy=RECOMMENDED_FINISH_BY[g.target]||'';
+    // Last day to finalize and still have the next quarter open before it closes.
+    g.lastDayForNext=addDaysISO(qEndISO(qNext(g.target)),-MIN_DAYS_BETWEEN);
+  } else {
+    g.alreadyComplete=true;
+    const nq=qStartISO(qNext(curQ));
+    g.nextOpens=(g.eligibleOn&&g.eligibleOn>nq)?g.eligibleOn:nq;
+  }
+  g.blocked=g.tooSoon||g.overdue.length>0||g.alreadyComplete;
+  return g;
+}
+
+// Plain-text version of the same decision — used by the New Audit / Delete Saved guards.
+function gateSummaryText(g,loc){
+  const L=loc?loc.name:'this location';
+  const lines=[];
+  if(g.alreadyComplete){
+    lines.push(g.curQ+' is already complete for '+L+'. The next assessment opens on '+fmtDay(g.nextOpens,true)+'.');
+  } else if(g.tooSoon){
+    lines.push('At least '+MIN_DAYS_BETWEEN+' days are required between assessments. Your last one ('+g.lastQuarter+') was finalized '+fmtDay(g.lastFinal)+', so the next can be started on '+fmtDay(g.eligibleOn,true)+'.');
+  }
+  if(g.overdue.length) lines.push(g.overdue.length+' Critical/High action item'+(g.overdue.length===1?' is':'s are')+' past due and must be marked Resolved first.');
+  return lines.join('\n\n');
+}
+function wipeBlockedMessage(){
+  // New Audit / Delete Saved wipe this device's Action List. While the next assessment
+  // can't open yet, that list is the only place the manager can resolve their items — so
+  // refuse the wipe rather than strand them with no way to clear the gate later.
+  if(!finalized) return '';
+  const owner=LOCATIONS.find(function(l){return l.id===ansOwnerId;})||selLoc;
+  if(!owner) return '';
+  const today=todayISO();
+  const g=evaluateGate(owner,recordsForLocation(owner.id),today,activeOverride(owner.id,today));
+  if(!g.blocked) return '';
+  return '🔒 You can\'t start a new assessment yet — and clearing this one now would delete the Action List you still need.\n\n'+gateSummaryText(g,owner)+'\n\nYour Action List stays on this device until then.';
+}
+
+// ── local history (so the check works offline and reflects updates immediately) ──
+function buildActionSnapshot(){
+  const auditDay=document.getElementById('locdate').value||todayISO();
+  return activeQs().filter(function(q){return ans[q.ref]==='NO';}).map(function(q){
+    const st=actionStatus[q.ref]||{status:'Open'};
+    const level=slaLevelFromCriticality(q.criticality);
+    return {ref:q.ref,question:q.question,level:level,dueDate:level?addDaysISO(auditDay,SLA_DAYS[level]):'',
+      status:st.status||'Open',resolvedOn:st.resolvedDate||''};
+  });
+}
+function syncHistory(){
+  if(!selLoc||!finalized) return;
+  const qtr=document.getElementById('locqtr').value;
+  const owner=ansOwnerId||selLoc.id;
+  const h=loadHistory();
+  const list=h[owner]||(h[owner]=[]);
+  let rec=list.find(function(r){return r.quarter===qtr;});
+  if(!rec){rec={quarter:qtr,finalizedOn:finalizedOn||todayISO()};list.push(rec);}
+  rec.late=rec.finalizedOn>quarterCutoffISO(qtr);
+  rec.auditDate=document.getElementById('locdate').value||'';
+  rec.actions=buildActionSnapshot();
+  saveHistory(h);
+}
+
+// ── quarter select: set by the check, never picked by hand ──
+function ensureQuarterOption(q){
+  const s=document.getElementById('locqtr');
+  if(!s||!q) return;
+  if(![...s.options].some(function(o){return o.value===q;})){const o=document.createElement('option');o.text=q;o.value=q;s.appendChild(o);}
+}
+function setQuarterLocked(q){
+  ensureQuarterOption(q);
+  const s=document.getElementById('locqtr');
+  s.value=q;s.disabled=true;s.title='Set automatically by your eligibility check';
+}
+function unlockQuarter(){const s=document.getElementById('locqtr');if(s){s.disabled=false;s.title='';}}
+
+// ── running the check + showing the result ──
+async function runGate(){
+  const token=++gateToken;
+  gateState={checking:true};
+  renderGateCard();updateStartBtn();
+  await publishedPromise;
+  if(token!==gateToken||!selLoc) return; // they picked someone else while this was running
+  const today=todayISO();
+  const ov=activeOverride(selLoc.id,today);
+  const g=evaluateGate(selLoc,recordsForLocation(selLoc.id),today,ov);
+  g.checking=false;g.unverified=(publishedStatus!=='ok');g.override=ov;
+  gateState=g;
+  if(g.target) setQuarterLocked(g.target); else unlockQuarter();
+  gateReceipt=g.blocked?null:{priorQuarter:g.lastQuarter||'',priorFinalizedOn:g.lastFinal||'',
+    status:ov?'Exception':(g.unverified?'Unverified':'Passed')};
+  renderGateCard();updateStartBtn();
+}
+function gateQuestionText(a){const q=QUESTIONS.find(function(x){return x.ref===a.ref;});return q?q.question:(a.question||'');}
+function gateItemsHtml(items,today,max){
+  if(!items.length) return '';
+  const shown=items.slice(0,max);
+  return '<ul class="gate-list">'+shown.map(function(a){
+    const over=a.dueDate&&a.dueDate<today;
+    return '<li><strong>['+xH(a.ref)+']</strong> '+xH(gateQuestionText(a).slice(0,95))
+      +(a.dueDate?' <span class="gate-meta">· due '+fmtDay(a.dueDate)+'</span>':'')
+      +(over?'<span class="gate-badge">past due</span>':'')
+      +(a.status==='In Progress'?' <span class="gate-meta">· In Progress</span>':'')+'</li>';
+  }).join('')+'</ul>'+(items.length>max?'<div class="gate-meta">…and '+(items.length-max)+' more</div>':'');
+}
+function renderGateCard(){
+  const el=document.getElementById('gateCard');
+  if(!el) return;
+  const g=gateState;
+  if(!g||!selLoc){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='';
+  if(g.checking){el.className='gate info';el.innerHTML='<h2>⏳ Checking your records…</h2><div>Looking up your previous assessments and action items.</div>';return;}
+  const today=g.today,L=xH(selLoc.name);
+  let cls='ok',title='',body='';
+  const alHelp=function(){
+    if(!g.openItems.length) return '';
+    return '<div class="gate-meta" style="margin-top:6px">Your Action List is saved on the device you used to finalize '+xH(g.lastQuarter||'your last assessment')+'. Update the items there and tap <strong>Send Action List</strong> — the check clears right away on that device, and everywhere else once your Risk VP publishes the update.</div>';
+  };
+
+  if(g.notYetActive){
+    cls='info';title='🗓️ '+L+' starts in '+xH(g.firstQ);
+    body='<p>This location joins the self-assessment program in <strong>'+xH(g.firstQ)+'</strong> (from '+fmtDay(qStartISO(g.firstQ))+'). Nothing to submit yet.</p>';
+  } else if(g.alreadyComplete){
+    cls='info';title='✅ '+xH(g.curQ)+' is already complete';
+    body='<p>'+L+' has completed its '+xH(g.curQ)+' self-assessment. The next one opens on <strong>'+fmtDay(g.nextOpens,true)+'</strong>'
+      +(g.eligibleOn&&g.nextOpens===g.eligibleOn?' (45 days after your last one on '+fmtDay(g.lastFinal)+').':'.')+'</p>';
+    if(g.overdue.length) body+='<p><strong>Recommended:</strong> '+g.overdue.length+' Critical/High item'+(g.overdue.length===1?' is':'s are')+' past due — they must be Resolved before that date.</p>'+gateItemsHtml(g.overdue,today,8)+alHelp();
+  } else if(g.tooSoon){
+    cls='warn';title='⏳ Your next assessment opens on '+fmtDay(g.eligibleOn,true);
+    body='<p>Your last assessment (<strong>'+xH(g.lastQuarter)+'</strong>) was finalized on <strong>'+fmtDay(g.lastFinal)+'</strong>'+(g.lastApprox?' (based on the audit date on file)':'')
+      +'. At least <strong>'+MIN_DAYS_BETWEEN+' days</strong> are required between assessments, so you can submit on <strong>'+fmtDay(g.eligibleOn,true)+'</strong> — '+g.daysLeft+' day'+(g.daysLeft===1?'':'s')+' from now.</p>';
+    if(g.openItems.length){
+      body+='<p><strong>Recommended:</strong> use these '+g.daysLeft+' days to close out your action plan so you\'re ready to go that day. '
+        +(g.overdue.length?'<strong>'+g.overdue.length+' Critical/High item'+(g.overdue.length===1?' is':'s are')+' already past due</strong> and must be Resolved before the assessment will open — even after '+fmtDay(g.eligibleOn)+'.':'These must be Resolved by their due dates to keep the next assessment open.')+'</p>'
+        +gateItemsHtml(g.openItems,today,8)+alHelp();
+    } else {
+      body+='<p><strong>Recommended:</strong> nothing to clear — you have no open Critical/High action items. Just come back on '+fmtDay(g.eligibleOn,true)+'.</p>';
+    }
+    if(g.willBeLate) body+='<p class="gate-meta">Heads up: that date is after '+xH(g.target)+' closed ('+fmtDay(quarterCutoffISO(g.target))+'), so it will be recorded as a late submission.</p>';
+  } else if(g.overdue.length){
+    cls='block';title='📋 Action items are past due';
+    body='<p>Critical and High items must be <strong>Resolved</strong> before your next assessment can open. <strong>'+g.overdue.length+'</strong> item'+(g.overdue.length===1?' is':'s are')+' past '+(g.overdue.length===1?'its':'their')+' due date:</p>'
+      +gateItemsHtml(g.overdue,today,10)+alHelp();
+  } else if(g.redirected){
+    cls='warn';title='📌 '+xH(g.target)+' comes first';
+    body='<p>'+xH(g.target)+' hasn\'t been submitted for '+L+'. Quarters are completed in order, so <strong>'+xH(g.target)+' has to be finished before '+xH(qNext(g.target))+' can open</strong>.</p>'
+      +'<p>You can start it now — '+(g.late?'it will be recorded as a <strong>late</strong> submission ('+xH(g.target)+' closed on '+fmtDay(quarterCutoffISO(g.target))+'; this doesn\'t change the finalized '+xH(g.target)+' numbers, but it does unlock '+xH(qNext(g.target))+'). ':'')
+      +'</p>';
+    const nq=xH(qNext(g.target));
+    if(g.finishBy&&today<=g.finishBy){
+      const left=diffDaysISO(today,g.finishBy);
+      body+='<p><strong>Please finalize '+xH(g.target)+' by '+fmtDay(g.finishBy,true)+'</strong> ('+left+' day'+(left===1?'':'s')+' from now). '+nq+' opens '+MIN_DAYS_BETWEEN+' days after you finalize — on '+fmtDay(addDaysISO(g.finishBy,MIN_DAYS_BETWEEN))+' if you finish on that date — which leaves time to complete it before the year closes.</p>'
+        +'<p class="gate-meta">Finalizing after '+fmtDay(g.lastDayForNext)+' means '+nq+' can\'t open before it closes.</p>';
+    } else {
+      body+='<p>Please finalize as soon as you can. '+nq+' opens '+MIN_DAYS_BETWEEN+' days after '+xH(g.target)+' is finalized, and the last day to finalize and still open '+nq+' before it closes is <strong>'+fmtDay(g.lastDayForNext)+'</strong>'
+        +(g.lastDayForNext<today?' — that date has passed, so '+nq+' will be completed late.':'.')+'</p>';
+    }
+  } else {
+    cls='ok';title='✅ You\'re clear to start '+xH(g.target);
+    body='<p>Your quarter has been set to <strong>'+xH(g.target)+'</strong>.</p>';
+  }
+  if(g.override) body+='<p class="gate-meta">🛈 An exception is on file for this location'+(g.override.note?': '+xH(g.override.note):'')+'.</p>';
+  if(g.unverified) body+='<p class="gate-meta">⚠️ Couldn\'t reach the published records, so this check used only what\'s saved on this device. Your Risk VP will confirm eligibility when your file arrives.</p>';
+
+  const btns='<button class="gate-btn alt" onclick="runGate()">🔄 Check again</button>';
+  el.className='gate '+cls;
+  el.innerHTML='<h2>'+title+'</h2>'+body
+    +'<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+btns+'</div>'
+    +'<div class="gate-meta" style="margin-top:8px">'+(publishedStatus==='ok'?'Checked against records published '+xH(publishedData.generatedAtDisplay||'')+' and this device.':'Checked against this device only.')+' If something here looks wrong, contact your Regional VP or Risk VP.</div>';
 }
 
 // ── START / BACK / NEW ──
@@ -854,6 +1223,8 @@ function requestSendActionList(){
   openEmailModal('actionlist');
 }
 function startAudit(){
+  if(gateState && (gateState.checking||gateState.blocked)) return;
+  ansOwnerId=selLoc?selLoc.id:ansOwnerId;
   document.getElementById('setup-screen').style.display='none';
   document.getElementById('audit-screen').style.display='block';
   ['pbadge','savebtn','sumbtn','albtn','expbtn','emailbtn','finalizebtn','newbtn','hloc','progress-wrap'].forEach(id=>{
@@ -865,7 +1236,7 @@ function startAudit(){
   document.getElementById('hloctext').innerHTML=
     '<span style="background:#1e3a8a;color:#bfdbfe;padding:1px 7px;border-radius:4px;font-weight:700;font-size:11px;margin-right:5px">'+xH(selLoc.id)+'</span>'
     +'<strong style="color:#e2e8f0">'+xH(selLoc.name)+'</strong>'
-    +' <span style="color:#64748b">\u00b7 '+xH(selLoc.region)+' \u00b7 '+document.getElementById('locqtr').value+'</span>';
+    +' <span style="color:#64748b">\u00b7 '+xH(selLoc.region)+' \u00b7 '+document.getElementById('locqtr').value+(todayISO()>quarterCutoffISO(document.getElementById('locqtr').value)?' \u00b7 \u23f0 late':'')+'</span>';
   inSum=false;
   updateFinalizedUI();
   buildChips();renderSecMgmt();render();
@@ -894,6 +1265,8 @@ function requestNewAudit(){
     alert('⚠️ You have '+openCount+' Open action item'+(openCount===1?'':'s')+' that hasn\'t been sent yet.\n\nTap "📋 Send Action List" (or "✉️ Send Audit" if you haven\'t submitted at all yet) to email your latest update to your Regional VP and Risk VP first. Once that\'s sent, New Audit will be available.\n\n("In Progress" items don\'t block this — only ones still marked Open.)');
     return;
   }
+  const wipeMsg=wipeBlockedMessage();
+  if(wipeMsg){ alert(wipeMsg); return; }
   if(!pendingNewAudit){
     const n=Object.keys(ans).length;
     pendingNewAudit=true;
@@ -925,6 +1298,7 @@ function newAudit(){
   Object.keys(naComment).forEach(k=>delete naComment[k]);
   Object.keys(actionStatus).forEach(k=>delete actionStatus[k]);
   finalized=false;
+  finalizedOn='';gateReceipt=null;ansOwnerId=null;
   actionListSentSinceChange=true; // nothing left to send after a genuine fresh start
   sf='All';stf='All';inSum=false;
   document.getElementById('locdate').value=new Date().toISOString().slice(0,10);
@@ -1120,10 +1494,14 @@ function cancelFinalize(){
 function confirmFinalize(){
   finalized=true;
   pendingFinalize=false;
+  // The 45-day clock runs from the first time this assessment was finalized — fixing a
+  // typo (unlock, edit, finalize again) doesn't restart it.
+  if(!finalizedOn) finalizedOn=todayISO();
   // Seed action list entries for every NO item that doesn't have one yet
   activeQs().filter(q=>ans[q.ref]==='NO').forEach(q=>{
     if(!actionStatus[q.ref]) actionStatus[q.ref]={status:'Open',note:''};
   });
+  syncHistory();
   updateSendActionListBtnVisibility();
   updateNewAuditBlockAppearance();
   updateSendActionListBlockAppearance();
@@ -1208,7 +1586,8 @@ function computeSLADueDate(criticality, auditDateStr){
   if(!level || !auditDateStr) return null;
   const auditDate=new Date(auditDateStr+'T00:00:00');
   if(isNaN(auditDate.getTime())) return null;
-  const due=new Date(auditDate.getTime() + SLA_DAYS[level]*24*60*60*1000);
+  const due=new Date(auditDate.getTime());
+  due.setDate(due.getDate()+SLA_DAYS[level]);
   return due;
 }
 function slaBadgeHtml(criticality, status){
@@ -1269,6 +1648,7 @@ function setActionStatus(ref,status){
     delete actionStatus[ref].resolvedDate;
   }
   persistState();
+  syncHistory();
   updateNewAuditBlockAppearance();
   // Deferred, not immediate: renderActionList() re-sorts by status and rebuilds this
   // exact <select> element — doing that synchronously, inside the element's own onchange
@@ -1437,7 +1817,7 @@ function buildWorkbookBlob(){
   const score=(yes+no)>0?Math.round(yes/(yes+no)*100)+'%':'N/A';
   const snames=['Safety Audit','Action Plan','NA Exclusions','Summary'];
 
-  const s1=[['TSC CONSOLIDATED SELF-ASSESSMENT'],['Location ID:',uid,'Location:',loc,'Region:',region,'State:',state],['Quarter:',qtr,'Completed By:',by,'Date of Audit:',auditDate],['Active Sections:',[...actSec].join(', ')],[],['#','Ref ID','Section','Audit Question','Criticality','Shift','Answer','Notes','N/A Reason','Additional Comment'],...qs.map(q=>[q.num,q.ref,q.section,q.question,q.criticality,q.shift,ans[q.ref]||'',notes[q.ref]||'',nar[q.ref]||'',naComment[q.ref]||''])];
+  const s1=[['TSC CONSOLIDATED SELF-ASSESSMENT'],['Location ID:',uid,'Location:',loc,'Region:',region,'State:',state],['Quarter:',qtr,'Completed By:',by,'Date of Audit:',auditDate,'Finalized On:',finalizedOn||'','Late Submission:',((finalizedOn||todayISO())>quarterCutoffISO(qtr))?'Yes':'No','Prior Assessment:',(gateReceipt&&gateReceipt.priorQuarter)||'','Prior Finalized On:',(gateReceipt&&gateReceipt.priorFinalizedOn)||'','Gate Check:',(gateReceipt&&gateReceipt.status)||''],['Active Sections:',[...actSec].join(', ')],[],['#','Ref ID','Section','Audit Question','Criticality','Shift','Answer','Notes','N/A Reason','Additional Comment'],...qs.map(q=>[q.num,q.ref,q.section,q.question,q.criticality,q.shift,ans[q.ref]||'',notes[q.ref]||'',nar[q.ref]||'',naComment[q.ref]||''])];
   const noItems=qs.filter(q=>ans[q.ref]==='NO');
   const s2=[['TSC SAFETY AUDIT \u2014 ACTION PLAN'],['Location:',loc,'Region:',region,'Quarter:',qtr],[],['#','Ref ID','Section','Issue / Question','Criticality','Notes / Corrective Action','Status','Resolution Note','Resolved Date'],...noItems.map(q=>{const st=actionStatus[q.ref]||{status:'Open',note:''};return[q.num,q.ref,q.section,q.question,q.criticality,notes[q.ref]||'',st.status,st.note||'',st.resolvedDate||''];})];
   const naItems=qs.filter(q=>ans[q.ref]==='N/A');
@@ -1640,7 +2020,8 @@ function sendEmail(){
       : 'Safety self-assessment '+(finalized?'finalized and ':'')+'completed.\n\n'+
         'Location: ['+locId+'] '+locName+'\n'+
         'Quarter: '+qtr+'\n'+
-        'Completed By: '+by+'\n\n'+
+        'Completed By: '+by+'\n'+
+        (((finalizedOn||todayISO())>quarterCutoffISO(qtr))?'Submission: LATE \u2014 '+qtr+' closed on '+fmtDay(quarterCutoffISO(qtr))+'\n':'')+'\n'+
         'Compliance Score: '+score+'%\n'+
         'YES: '+yes+'   NO: '+no+'   N/A: '+na+
         actionList+
@@ -1685,12 +2066,17 @@ const _restored=loadPersistedState();
 renderSetup();
 if(_restored && selLoc){
   document.getElementById('locby').value=_restored.completedBy||'';
+  ensureQuarterOption(_restored.quarter||'Q3 2026');
   document.getElementById('locqtr').value=_restored.quarter||'Q3 2026';
   document.getElementById('locdate').value=_restored.auditDate||new Date().toISOString().slice(0,10);
   document.getElementById('lcid').textContent=selLoc.id;
   document.getElementById('lcname').textContent=selLoc.name;
   document.getElementById('lcmeta').textContent=selLoc.region+' \u00b7 '+selLoc.state+(selLoc.rvp?' \u00b7 RVP: '+selLoc.rvp:'');
   document.getElementById('lchip').style.display='flex';
+  ansOwnerId=_restored.ansOwnerId||selLoc.id;
+  // Sessions finalized before this version have no finalize date — fall back to the audit
+  // date so this device's history (and the 45-day clock) still reflects them.
+  if(finalized){ if(!finalizedOn) finalizedOn=_restored.auditDate||todayISO(); syncHistory(); }
   startAudit();
 }
 </script>
