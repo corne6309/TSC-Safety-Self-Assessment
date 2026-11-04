@@ -261,6 +261,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   #printRedirectMsg p{font-size:15px;color:#334155;line-height:1.6;max-width:480px;margin:0 auto 12px}
   #printRedirectMsg .highlight{background:#fef3c7;border-radius:8px;padding:14px 18px;font-weight:700;color:#92400e;margin-top:10px}
 }
+#myAudits{max-width:880px;margin:0 auto 12px}
+.ma-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #e2e8f0}
+.ma-row:first-of-type{border-top:none}
+.ma-main{flex:1;min-width:0}
+.ma-name{font-weight:700;font-size:13.5px;color:#0f172a}
+.ma-sub{font-size:12px;color:#64748b;margin-top:1px}
+.ma-btn{border:none;border-radius:6px;padding:8px 13px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap}
+.ma-resume{background:#1e3a8a;color:#fff}
+.ma-del{background:#fee2e2;color:#b91c1c}
+#priorBanner{max-width:880px;margin:8px auto 0;background:#fef3c7;border-left:4px solid #d97706;color:#78350f;border-radius:6px;padding:9px 12px;font-size:12.5px;line-height:1.5}
+#priorBanner button{margin-left:6px;border:none;background:#78350f;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700;font-size:12px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -305,7 +316,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="btn" id="sendactionlistbtn" onclick="requestSendActionList()" style="display:none;background:#7e22ce" title="Send just an Action List status update — for when you've updated statuses after your initial submission">📋 Send Action List</button>
       </div>
       <div id="dangerRow" style="display:flex;width:100%;margin-top:4px">
-        <button class="btn btn-amber" id="newbtn" onclick="requestNewAudit()" style="display:none">🔄 New Audit</button>
+        <button class="btn btn-amber" id="newbtn" onclick="openMyAudits()" style="display:none" title="See everything saved on this device and switch between locations. Nothing is deleted.">📂 My Audits</button>
       </div>
     </div>
   </div>
@@ -321,6 +332,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <!-- SETUP -->
 <div id="setup-screen">
+  <div id="myAudits" style="display:none"></div>
   <div id="storageWarning" style="display:none;background:#7f1d1d;border:2px solid #dc2626;border-radius:12px;padding:14px 16px;margin-bottom:12px">
     <div style="font-size:14px;font-weight:800;color:#fecaca;margin-bottom:4px">⚠️ This browser is not saving your progress</div>
     <div style="font-size:12.5px;color:#fecaca;line-height:1.5">Your answers only exist in memory right now and will be <strong>lost</strong> if you close this app or the page reloads. Export to Excel often to keep a safe copy, or try opening this in Safari (iPhone/iPad) or Chrome (Android/desktop) instead.</div>
@@ -337,7 +349,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div id="lchip">
       <span class="lcid" id="lcid"></span>
       <div><div class="lcname" id="lcname"></div><div class="lcmeta" id="lcmeta"></div></div>
-      <button id="deleteSavedBtn" onclick="requestDeleteSaved()" style="display:none;border:none;background:#fee2e2;color:#b91c1c;font-size:11px;font-weight:700;padding:5px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;margin-right:6px">🗑️ Delete Saved</button>
+      <button id="deleteSavedBtn" onclick="deleteSlotPrompt(selLoc&&selLoc.id)" style="display:none;border:none;background:#fee2e2;color:#b91c1c;font-size:11px;font-weight:700;padding:5px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;margin-right:6px">🗑️ Delete saved</button>
       <span class="lcx" onclick="clearLoc()">✕</span>
     </div>
     <div class="mrow">
@@ -362,6 +374,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- AUDIT -->
 <div id="audit-screen">
   <div id="finalizedBanner" style="display:none"></div>
+  <div id="priorBanner" style="display:none"></div>
   <div style="max-width:880px;margin:0 auto 10px;text-align:center">
     <button id="unlockbtn" style="display:none;background:#64748b;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer">🔓 Unlock to Fix a Mistake</button>
   </div>
@@ -447,8 +460,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <span id="helpVideoPlaceholder">📹 Video walkthrough coming soon — for now, follow the steps below.</span>
       </div>
 
+      <div class="help-tip" style="background:#dcfce7;border-left-color:#15803d;color:#14532d"><strong>New:</strong> you can now keep <strong>up to 5 assessments open at once</strong> on the same device, <strong>one per location</strong>. The orange button that used to say "New Audit" is now <strong>"📂 My Audits"</strong>, and it never deletes anything. Also, past-due action items now show as a <strong>reminder</strong>. They no longer stop you from starting your next assessment. The video was recorded before these changes, and everything else in it still applies.</div>
       <div class="help-tip" style="background:#dbeafe;border-left-color:#1e3a8a;color:#1e3a8a;font-weight:600">🗓️ <strong>You do NOT have to finish this in one sitting.</strong> You have the entire quarter to complete it. Answer a few questions, tap "💾 Save Now" (or just close the app — it saves automatically), and come back whenever you have time. Nothing is lost.</div>
-      <div class="help-tip" style="background:#fef3c7;border-left-color:#d97706;color:#78350f">📌 <strong>When you can start.</strong> Quarters are completed in order (Q3 before Q4), at least <strong>45 days</strong> must pass between one finalized assessment and the next, and any <strong>Critical or High</strong> action item past its due date has to be marked Resolved first. When you pick your location the app checks all three, tells you exactly what's needed and the earliest date you can start, and sets the quarter for you.</div>
+      <div class="help-tip" style="background:#fef3c7;border-left-color:#d97706;color:#78350f">📌 <strong>When you can start.</strong> Quarters are completed in order (Q3 before Q4), and at least <strong>45 days</strong> must pass between one finalized assessment and the next. When you pick your location the app checks both, tells you the earliest date you can start, and sets the quarter for you. <strong>Past-due action items never stop you from starting.</strong> They are shown as a reminder so you can keep updating them.</div>
 
       <div class="help-section-title">🔘 What Each Button Does, In Order</div>
       <div class="help-step"><div class="help-step-num">💾</div><div class="help-step-text"><strong>Save Now</strong> — saves your progress right now. You don't need this often (it auto-saves as you go), but it's there for peace of mind.</div></div>
@@ -458,31 +472,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="help-step"><div class="help-step-num">⬇</div><div class="help-step-text"><strong>Excel (not Print/PDF)</strong> — tap this after finalizing to download your results as a file. This step comes before Send Audit.</div></div>
       <div class="help-step"><div class="help-step-num">✉️</div><div class="help-step-text"><strong>Send Audit</strong> — tap this last, for your very first submission. It opens an email pre-filled with the right recipients — just attach the file you just downloaded and hit send.</div></div>
       <div class="help-step"><div class="help-step-num">📋</div><div class="help-step-text"><strong>Send Action List</strong> — appears once you have action items, but stays greyed out (🔒) until you've sent your initial audit. Use this (not Send Audit) for every update after that first submission — it's clearly labeled for your Regional VP and Risk VP so it's obvious it's an update, not a brand-new submission.</div></div>
-      <div class="help-step"><div class="help-step-num">🔄</div><div class="help-step-text"><strong>New Audit</strong> — this is also how you delete/reset the current audit. Use it for starting a genuinely new assessment (like next quarter), or to wipe a mistake and start completely over. Don't tap this if you're just taking a break — your progress is already saved automatically.</div></div>
+      <div class="help-step"><div class="help-step-num">📂</div><div class="help-step-text"><strong>My Audits</strong> — opens the list of every assessment saved on this device so you can switch between locations. Your place is saved automatically when you switch, so nothing is deleted or lost. Tap Resume on any location to pick up where you left off.</div></div>
+
+      <div class="help-section-title">🏨 Looking After More Than One Location?</div>
+      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text">You can have <strong>up to 5 assessments open at once</strong> on the same device, <strong>one per location</strong>. Work on one, tap <strong>"📂 My Audits"</strong>, pick the next location and start it. Come back to the first one any time with <strong>Resume</strong>.</div></div>
+      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text">You can't open two assessments for the <strong>same</strong> location. Picking a location you already have open simply takes you back into it.</div></div>
+      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>Completed By</strong> is kept separately for each location. If the Location Manager is the one completing it, or you are covering for them, set it for that location on the first screen. You can change it again any time with "✏️ Change setup".</div></div>
+      <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text">Finish and finalize one location whenever you are ready. Finalizing never stops you from opening another location.</div></div>
 
       <div class="help-section-title">📋 The Full Process, Step by Step</div>
       <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text"><strong>Pick your location.</strong> Tap the search box on the first screen and type your location's name — select it from the list that appears.</div></div>
       <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>Enter your name and today's date.</strong> The quarter fills in on its own — no need to figure that out yourself.</div></div>
       <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>Check your sections are right.</strong> Most sections are already turned on for you. If your location has vehicles or golf carts, make sure those are switched on too.</div></div>
       <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>Go through each question, whenever you have time.</strong> Tap YES, NO, or N/A for every item. If you tap NO, add a short note about what's wrong. If you tap N/A, add a short reason why it doesn't apply. Stop and come back as many times as you need.</div></div>
-      <div class="help-step"><div class="help-step-num">5</div><div class="help-step-text"><strong>Check your Action List as you go.</strong> Update item statuses throughout the quarter as things get fixed — this doesn't require finishing the assessment first. Target timeframes: Critical items in 2 weeks, High in 3 weeks, Medium in 4 weeks from the date you flagged them. A colored badge shows how you're tracking against that.</div></div>
+      <div class="help-step"><div class="help-step-num">5</div><div class="help-step-text"><strong>Check your Action List as you go.</strong> Update item statuses throughout the quarter as things get fixed — this doesn't require finishing the assessment first. Target timeframes: Critical items in 2 weeks, High in 3 weeks, Medium in 4 weeks from the date you flagged them. A colored badge shows how you're tracking against that. Items that are past due show up as a reminder only. They never stop you from starting your next quarter.</div></div>
       <div class="help-step"><div class="help-step-num">6</div><div class="help-step-text"><strong>Tap Finalize once every question is answered.</strong> Made a mistake after finalizing? Tap "Unlock to Fix a Mistake" — you can always go back in.</div></div>
       <div class="help-step"><div class="help-step-num">7</div><div class="help-step-text"><strong>Tap Excel, then Send Audit.</strong> Attach the downloaded file to the email that opens, and hit send.</div></div>
 
       <div class="help-section-title">🔁 Updating Your Action List Later? Resubmit the Same Way</div>
-      <div class="help-step-text" style="margin-bottom:8px">Fixed something after your initial submission? Come back into the app, update the status on your Action List (Open → In Progress → Resolved), then <strong>tap Excel, then tap "📋 Send Action List"</strong> (not Send Audit this time — that's just for your first submission). This works just like a Regional VP follow-up visit: your updated file automatically replaces your prior submission once the Risk VP loads it — nothing gets duplicated, and there's no separate process to learn.</div>
+      <div class="help-step-text" style="margin-bottom:8px">Fixed something after your initial submission? Come back into the app, update the status on your Action List (Open → In Progress → Resolved), then <strong>tap Excel, then tap "📋 Send Action List"</strong> (not Send Audit this time — that's just for your first submission). This works just like a Regional VP follow-up visit: your updated file automatically replaces your prior submission once the Risk VP loads it — nothing gets duplicated, and there's no separate process to learn. Already started the next quarter? Your earlier quarter's Action List is still there. Tap the yellow reminder bar at the top and open it, update the items, and send the update the same way.</div>
 
       <div class="help-section-title">💡 A Few Extra Tips</div>
       <div class="help-tip">💡 <strong>Never use your browser's Print or Save as PDF button.</strong> Always use the green Excel button — that's the only format that can be tracked properly.</div>
       <div class="help-tip">💡 Your progress saves automatically as you go. It's safe to close the app and come back later — you'll pick up right where you left off.</div>
       <div class="help-tip">📱 <strong>iPhone users:</strong> the Send Audit button may open Apple's built-in Mail app instead of Outlook. To fix this permanently: go to your iPhone's <strong>Settings → Outlook → Default Mail App</strong> and select Outlook. This is a one-time fix for your whole phone, not just this app.</div>
 
-      <div class="help-section-title">🗑️ Need to Delete or Reset an Audit?</div>
-      <div class="help-tip" style="background:#fee2e2;border-left-color:#dc2626;color:#7f1d1d;font-weight:600">🔒 If you have any Action List items still marked <strong>Open</strong>, New Audit and Delete Saved won't work until you've sent your latest Action List update — same as submitting your original audit. This protects your data from being accidentally lost. Items marked "In Progress" don't block this, since those can carry into next quarter.</div>
-      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text">If you're already inside the audit, tap the orange <strong>"🔄 New Audit"</strong> button. If you're on the setup screen with a saved audit showing, tap <strong>"🗑️ Delete Saved"</strong> right next to your location name instead — same result, either way.</div></div>
-      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text">The button changes to <strong>"⚠️ Tap again — [X] lost"</strong>, showing exactly how many answers will be deleted. This is your warning — tap anything else to cancel, or wait a few seconds and it resets on its own.</div></div>
-      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text">Tap the same button again to confirm. Every answer, note, and Action List entry for the current audit is cleared.</div></div>
-      <div class="help-tip">⚠️ This cannot be undone. If you might need what you've entered, tap Excel to save a copy first before deleting.</div>
+      <div class="help-section-title">🗑️ Need to Delete an Audit?</div>
+      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text">Tap <strong>"📂 My Audits"</strong>, or stay on the first screen. Every assessment saved on this device is listed under <strong>"On this device"</strong>.</div></div>
+      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text">Tap <strong>Delete</strong> next to the location. You'll be asked to confirm, and it tells you exactly what will be removed.</div></div>
+      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text">If your audit or your latest Action List update hasn't been sent yet, the confirmation warns you. You can still delete, but send first if your Regional VP and Risk VP still need it.</div></div>
+      <div class="help-tip">⚠️ Deleting can't be undone. If you might need what you've entered, tap Excel to save a copy first. You never need to delete just to start another location or the next quarter.</div>
 
       <div class="help-section-title">🔄 App Acting Strange or Out of Date?</div>
       <div class="help-step-text" style="margin-bottom:8px">Tap the <strong>"🔄 Refresh"</strong> button near the top of the screen. This is safe — your progress is saved automatically before it refreshes, so you won't lose anything. Use this any time something looks wrong, missing, or like an older version of the app.</div>
@@ -512,23 +531,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="flow-arrow">↓</div>
       <div class="flow-step" style="background:#ccfbf1;color:#0f766e">4. Excel + Send Audit<div class="fs-sub">Initial submission complete</div></div>
 
-      <div class="flow-section-title">Ongoing (as many times as needed this quarter)</div>
-      <div class="flow-step" style="background:#f1f5f9;color:#334155">Update item to Open<div class="fs-sub">e.g. reopening a finding</div></div>
-      <div class="flow-arrow">↓</div>
-      <div class="flow-step" style="background:#fee2e2;color:#991b1b">🔒 New Audit &amp; Delete: locked<div class="fs-sub">Protects unsent data</div></div>
+      <div class="flow-section-title">Ongoing (as many times as needed)</div>
+      <div class="flow-step" style="background:#f1f5f9;color:#334155">Update an action item<div class="fs-sub">Open → In Progress → Resolved</div></div>
       <div class="flow-arrow">↓</div>
       <div class="flow-step" style="background:#f3e8ff;color:#6b21a8">Send Action List<div class="fs-sub">Same recipients as original audit</div></div>
-      <div class="flow-arrow">↓</div>
-      <div class="flow-step" style="background:#ccfbf1;color:#0f766e">✅ New Audit &amp; Delete: unlocked<div class="fs-sub">Ready for next quarter</div></div>
 
-      <div class="flow-note">"In Progress" items never lock this — only "Open" ones</div>
+      <div class="flow-section-title">More than one location?</div>
+      <div class="flow-step" style="background:#fef3c7;color:#92400e">📂 My Audits<div class="fs-sub">Saves your place and lists everything on this device</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step" style="background:#f1f5f9;color:#334155">Pick the next location and start it<div class="fs-sub">Up to 5 open, one per location. Resume any time.</div></div>
+
+      <div class="flow-note">Past-due action items show as a reminder. They never stop you from starting the next quarter.</div>
     </div>
   </div>
 </div>
 
 <script>
 const QUESTIONS = [{"num": 1, "ref": "GS-01", "question": "Walking surfaces clean, dry, free from slip/trip hazards", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "All Shifts", "section": "General Safety"}, {"num": 2, "ref": "GS-02", "question": "Wet floor signs available and used", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "All Shifts", "section": "General Safety"}, {"num": 3, "ref": "GS-03", "question": "Aisles/corridors clear of obstructions", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "General Safety"}, {"num": 4, "ref": "GS-04", "question": "PPE available, accessible, AND being worn by employees for assigned tasks", "criticality": "🔴 CRITICAL — Top 10 #9", "shift": "All Shifts", "section": "General Safety"}, {"num": 5, "ref": "GS-05", "question": "No frayed/damaged electrical cords; damaged cords have replacement ordered and logged in Redbook", "criticality": "🔴 CRITICAL — Fire/Shock", "shift": "All Shifts", "section": "General Safety"}, {"num": 6, "ref": "GS-06", "question": "Electrical panels 36\" clearance", "criticality": "🟠 HIGH — Citation Risk", "shift": "All Shifts", "section": "General Safety"}, {"num": 7, "ref": "GS-07", "question": "Extension cords not permanent wiring", "criticality": "🟠 HIGH — Citation Risk", "shift": "All Shifts", "section": "General Safety"}, {"num": 8, "ref": "GS-08", "question": "BBP exposure control plan in place AND employees trained on BBP procedures", "criticality": "🔴 CRITICAL — Service Industry", "shift": "All Shifts", "section": "General Safety"}, {"num": 9, "ref": "GS-09", "question": "Closed-toe non-slip footwear worn", "criticality": "🔴 CRITICAL — Observable", "shift": "All Shifts", "section": "General Safety"}, {"num": 10, "ref": "GS-10", "question": "Storage organized, heavy items low", "criticality": "🟠 HIGH — Walk-Through", "shift": "All Shifts", "section": "General Safety"}, {"num": 11, "ref": "GS-11", "question": "Biohazard supplies stocked (red bags, sharps, BBP kits)", "criticality": "🔴 CRITICAL — BBP Compliance", "shift": "All Shifts", "section": "General Safety"}, {"num": 12, "ref": "GS-12", "question": "PPE hazard assessment documented", "criticality": "🟠 HIGH — Documentation", "shift": "All Shifts", "section": "General Safety"}, {"num": 13, "ref": "GS-13", "question": "Proper signage displayed (safety signs, no smoking)", "criticality": "🟡 MEDIUM — Visual Check", "shift": "All Shifts", "section": "General Safety"}, {"num": 14, "ref": "GS-14", "question": "Cart doorway security positioning", "criticality": "🟡 MEDIUM — Security", "shift": "Day Shift", "section": "General Safety"}, {"num": 15, "ref": "GS-15", "question": "Back safety/lifting techniques observed (ergonomics)", "criticality": "🟠 HIGH — Injury Prevention", "shift": "All Shifts", "section": "General Safety"}, {"num": 16, "ref": "GS-16", "question": "Labels on shelves with contents", "criticality": "🟠 HIGH — Organization", "shift": "All Shifts", "section": "General Safety"}, {"num": 17, "ref": "GS-17", "question": "Level floor hazards identified and marked", "criticality": "🟠 HIGH — Walk-Through", "shift": "All Shifts", "section": "General Safety"}, {"num": 18, "ref": "GS-18", "question": "Safety posters displayed and current", "criticality": "🟠 HIGH — Compliance", "shift": "All Shifts", "section": "General Safety"}, {"num": 19, "ref": "CS-01", "question": "SDS available for ALL chemicals on-site AND binder accessible to all employees", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 20, "ref": "CS-02", "question": "Chemical containers have original labels", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 21, "ref": "CS-03", "question": "Secondary containers labeled with GHS", "criticality": "🔴 CRITICAL — Common Violation", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 22, "ref": "CS-04", "question": "Chemicals stored in ventilated areas", "criticality": "🟠 HIGH — Storage", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 23, "ref": "CS-05", "question": "Eye wash within 10 sec of chemical areas", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 24, "ref": "CS-06", "question": "Flammable chemicals in approved cabinet (if applicable)", "criticality": "🔴 CRITICAL — Fire/Explosion", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 25, "ref": "CS-07", "question": "Nitrile gloves (not vinyl) for cleaning", "criticality": "🟠 HIGH — Observation", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 26, "ref": "CS-08", "question": "Chemical PPE at point of use Goggles/Apron/Mask/Gloves", "criticality": "🟠 HIGH — Accessibility", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 27, "ref": "CS-09", "question": "Written HazCom Program in place", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 28, "ref": "CS-10", "question": "Chemical-resistant gloves available", "criticality": "🟠 HIGH — PPE", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 29, "ref": "CS-11", "question": "Chemical safety training", "criticality": "🟠 HIGH — Training", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 30, "ref": "CS-12", "question": "Full PPE at chemical dispensing stations", "criticality": "🔴 CRITICAL — Full PPE", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 31, "ref": "CS-13", "question": "Pigmats at chemical storage/dispensing", "criticality": "🟠 HIGH — Spill Prevention", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 32, "ref": "CS-14", "question": "Eye wash weekly inspection checklist", "criticality": "🔴 CRITICAL — Maintenance", "shift": "All Shifts", "section": "Chemical Safety"}, {"num": 33, "ref": "EP-01", "question": "Written EAP in place (TSC own, independent of client) and current", "criticality": "🔴 CRITICAL — Required", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 34, "ref": "EP-02", "question": "EAP includes evac routes/assembly points", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 35, "ref": "EP-03", "question": "Emergency contacts posted", "criticality": "🟠 HIGH — Posting", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 36, "ref": "EP-04", "question": "Exit routes marked with illuminated EXIT signs, unobstructed and well-lit", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 37, "ref": "EP-05", "question": "Exit doors unlocked from inside", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 38, "ref": "EP-06", "question": "First aid kits stocked, accessible at all work areas, with accident report packages included", "criticality": "🟠 HIGH — Walk-Through", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 39, "ref": "EP-07", "question": "Emergency procedures communicated to employees", "criticality": "🔴 CRITICAL — Life Safety", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 40, "ref": "EP-08", "question": "Client coordination docs on file", "criticality": "🟠 HIGH — Documentation", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 41, "ref": "EP-09", "question": "Fire prevention plan documented", "criticality": "🔴 CRITICAL — Required", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 42, "ref": "EP-10", "question": "Fire extinguishers properly mounted, unobstructed, with current monthly inspection tags", "criticality": "🔴 CRITICAL — Top Citation", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 43, "ref": "EP-11", "question": "Employees trained on extinguisher use", "criticality": "🟠 HIGH — Annual Req", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 44, "ref": "EP-12", "question": "Evacuation drills conducted annually", "criticality": "🟠 HIGH — Annual Req", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 45, "ref": "EP-13", "question": "Employees/Supervisors know how to report emergencies", "criticality": "🟠 HIGH — Knowledge", "shift": "All Shifts", "section": "Emergency Prep"}, {"num": 46, "ref": "TD-01", "question": "Pre Shift Safety orientation", "criticality": "🔴 CRITICAL — Day 1", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 47, "ref": "TD-02", "question": "Orientation: hazcom, PPE, emergency procedures", "criticality": "🔴 CRITICAL — Content", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 48, "ref": "TD-03", "question": "Orientation records signed and filed", "criticality": "🟠 HIGH — Documentation", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 49, "ref": "TD-04", "question": "HazCom training annually", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 50, "ref": "TD-05", "question": "BBP training annually", "criticality": "🔴 CRITICAL — Annual", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 51, "ref": "TD-06", "question": "Training records with dates/signatures", "criticality": "🟠 HIGH — Documentation", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 52, "ref": "TD-07", "question": "OSHA poster displayed in employee area", "criticality": "🔴 CRITICAL — Required", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 53, "ref": "TD-08", "question": "Incident reporting procedures documented (Redbook)", "criticality": "🔴 CRITICAL — Recordkeeping", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 54, "ref": "TD-09", "question": "Employees know how to report injuries", "criticality": "🟠 HIGH — Knowledge", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 55, "ref": "TD-10", "question": "OSHA 300 log maintained (>10 employees)", "criticality": "🔴 CRITICAL — Legal Req", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 56, "ref": "TD-11", "question": "Pre-shift safety briefings documented with consistent, rotating topics", "criticality": "🟠 HIGH — Observable", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 57, "ref": "TD-12", "question": "Handbook acknowledgment on file", "criticality": "🟡 MEDIUM — Admin", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 58, "ref": "TD-13", "question": "Annual safety refresher conducted", "criticality": "🟠 HIGH — Annual", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 59, "ref": "TD-14", "question": "Training records retained per OSHA", "criticality": "🟠 HIGH — Retention", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 60, "ref": "TD-15", "question": "Discuss Claims GB: Review claims with team", "criticality": "🟠 HIGH — Risk Awareness", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 61, "ref": "TD-16", "question": "Safety documentation organized, all required forms available and current", "criticality": "🟡 MEDIUM — Organization", "shift": "All Shifts", "section": "Training & Docs"}, {"num": 62, "ref": "VH-01", "question": "Valid driver's licenses on file (Online People MVR)", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 63, "ref": "VH-02", "question": "MVR consent forms signed", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 64, "ref": "VH-03", "question": "Driver authorization form completed", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 65, "ref": "VH-04", "question": "Vehicle Use Agreement signed", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 66, "ref": "VH-05", "question": "Bad MVR drivers reassigned/removed", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 67, "ref": "VH-06", "question": "Pre-trip inspections daily/each shift", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 68, "ref": "VH-07", "question": "Inspection: seats, belts, lights, mirrors, emergency equip", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 69, "ref": "VH-08", "question": "Defects reported to Supervisor/HR immediately", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 70, "ref": "VH-09", "question": "Unsafe vehicles out of service until repaired", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 71, "ref": "VH-10", "question": "Maintenance per manufacturer intervals", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 72, "ref": "VH-11", "question": "Maintenance records signed/dated in file", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 73, "ref": "VH-12", "question": "Seat belts worn at all times", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 74, "ref": "VH-13", "question": "No cell phone use while driving", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 75, "ref": "VH-14", "question": "No smoking/eating in vehicles", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 76, "ref": "VH-15", "question": "Incident report packet in glove box", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 77, "ref": "VH-16", "question": "Vehicle accidents reported within 30 min AND escalated to Risk Manager", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 78, "ref": "VH-17", "question": "Post-incident drug test within 8 hrs", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 79, "ref": "VH-18", "question": "Personal vehicle use approved by HR", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 80, "ref": "VH-19", "question": "Insurance proof on file and current; uninsured drivers removed from driving duties", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 81, "ref": "VH-20", "question": "High-point drivers (5-8 pts) enrolled in improvement course within 60 days, certificates on file", "criticality": "🟡 MEDIUM", "shift": "All Shifts", "section": "Vehicles"}, {"num": 82, "ref": "VH-21", "question": "Monthly inspection reports submitted", "criticality": "🟡 MEDIUM", "shift": "All Shifts", "section": "Vehicles"}, {"num": 83, "ref": "VH-22", "question": "Annual MVR reviews completed", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 84, "ref": "VH-23", "question": "No drivers under 21", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 85, "ref": "VH-24", "question": "Vehicles for company business only", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 86, "ref": "VH-25", "question": "Mobile Phone Agreement signed", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 87, "ref": "VH-26", "question": "Employees job-ready before driving", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 88, "ref": "VH-27", "question": "No unauthorized persons in vehicles", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 89, "ref": "VH-28", "question": "Accident report with witness statements", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 90, "ref": "VH-29", "question": "Driver point system communicated", "criticality": "🟠 HIGH", "shift": "All Shifts", "section": "Vehicles"}, {"num": 91, "ref": "VH-30", "question": "MVR list current, all drivers verified", "criticality": "🔴 CRITICAL", "shift": "All Shifts", "section": "Vehicles"}, {"num": 92, "ref": "HK-01", "question": "Carts properly loaded, not overloaded", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 93, "ref": "HK-02", "question": "Carts not blocking hallways/exits/fire equip", "criticality": "🔴 CRITICAL — Life Safety", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 94, "ref": "HK-03", "question": "Cart wheels and brakes functioning", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 95, "ref": "HK-04", "question": "Chemicals on carts labeled and stored upright", "criticality": "🔴 CRITICAL — HazCom", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 96, "ref": "HK-05", "question": "Knock and announce before entering rooms", "criticality": "🟠 HIGH — Security", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 97, "ref": "HK-06", "question": "Door security devices used per policy", "criticality": "🟠 HIGH — Security", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 98, "ref": "HK-07", "question": "Proper body mechanics when making beds", "criticality": "🟠 HIGH — Ergonomics", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 99, "ref": "HK-08", "question": "No standing on furniture/bathtubs/unstable surfaces", "criticality": "🔴 CRITICAL — Fall Prevention", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 100, "ref": "HK-09", "question": "Proper ventilation with cleaning chemicals in rooms", "criticality": "🟠 HIGH — Ventilation", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 101, "ref": "HK-10", "question": "Vacuum cords managed (trip prevention)", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 102, "ref": "HK-11", "question": "Wet floor signs placed immediately", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 103, "ref": "HK-12", "question": "Spills cleaned immediately", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 104, "ref": "HK-13", "question": "Proper lifting techniques for linen bags", "criticality": "🟠 HIGH — Ergonomics", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 105, "ref": "HK-14", "question": "Linen chute areas clean and unobstructed", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 106, "ref": "HK-15", "question": "Soiled linen handled with gloves (needlestick prevention)", "criticality": "🔴 CRITICAL — BBP", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 107, "ref": "HK-16", "question": "Found sharps/biohazards reported/handled correctly", "criticality": "🔴 CRITICAL — BBP", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 108, "ref": "HK-17", "question": "Lint traps cleaned regularly and documented", "criticality": "🟠 HIGH — Fire Prevention", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 109, "ref": "HK-18", "question": "Chemicals never mixed together", "criticality": "🔴 CRITICAL — Safety", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 110, "ref": "HK-19", "question": "Dilution systems maintained/calibrated", "criticality": "🟡 MEDIUM", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 111, "ref": "HK-20", "question": "PPE worn when handling chemicals", "criticality": "🔴 CRITICAL — PPE", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 112, "ref": "HK-21", "question": "Non-slip footwear worn by all HK employees", "criticality": "🔴 CRITICAL — Observable", "shift": "Day Shift", "section": "Housekeeping"}, {"num": 113, "ref": "PA-01", "question": "Lobby floors clean, dry, slip/trip free", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 114, "ref": "PA-02", "question": "Entrance mats in good condition, secured (Report defective of trip hazard)", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 115, "ref": "PA-03", "question": "Wet floor signs during/after lobby cleaning", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 116, "ref": "PA-04", "question": "Furniture stable and in good repair (Report defective )", "criticality": "🟡 MEDIUM", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 117, "ref": "PA-05", "question": "Corridors well-lit and free from obstructions", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 118, "ref": "PA-06", "question": "Emergency exit signs illuminated and visible", "criticality": "🔴 CRITICAL — Life Safety", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 119, "ref": "PA-07", "question": "Stairwell handrails secure and in good condition", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 120, "ref": "PA-08", "question": "No storage blocking corridors/stairwells", "criticality": "🔴 CRITICAL — Life Safety", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 121, "ref": "PA-09", "question": "Restroom floors clean, dry, non-slip", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 122, "ref": "PA-10", "question": "Restroom cleaning chemicals labeled", "criticality": "🔴 CRITICAL — HazCom", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 123, "ref": "PA-11", "question": "Wet floor signs during restroom cleaning", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 124, "ref": "PA-12", "question": "Pool area wet floor signage, non-slip surfaces", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 125, "ref": "PA-13", "question": "Fitness area clean and hazard-free", "criticality": "🟡 MEDIUM", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 126, "ref": "PA-14", "question": "Pool chemical storage secure/labeled", "criticality": "🔴 CRITICAL — Chemical", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 127, "ref": "PA-15", "question": "Sidewalks/walkways clear", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 128, "ref": "PA-16", "question": "Loading dock organized, clean, safe", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 129, "ref": "PA-17", "question": "Elevator areas clean, transitions level", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 130, "ref": "PA-18", "question": "Emergency communication in elevators functional", "criticality": "🟡 MEDIUM", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 131, "ref": "PA-19", "question": "Cleaning equipment stored safely (not blocking access)", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "Public Areas"}, {"num": 132, "ref": "KS-01", "question": "Kitchen floors clean, dry, grease-free", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 133, "ref": "KS-02", "question": "Non-slip floor mats in good condition", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 134, "ref": "KS-03", "question": "Wet floor signs during/after floor cleaning", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 135, "ref": "KS-04", "question": "Floor drains clean, unclogged, maintained", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 136, "ref": "KS-05", "question": "Non-slip closed-toe footwear worn", "criticality": "🔴 CRITICAL — Observable", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 137, "ref": "KS-06", "question": "Dishwashing area organized, hazard-free", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 138, "ref": "KS-07", "question": "Chemical dispensers properly functioning", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 139, "ref": "KS-08", "question": "PPE worn for hot water/chemicals (gloves, aprons)", "criticality": "🔴 CRITICAL — PPE", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 140, "ref": "KS-09", "question": "Broken glass/china handling procedures followed", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 141, "ref": "KS-10", "question": "Proper drainage, no standing water in dishwash", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 142, "ref": "KS-11", "question": "Exhaust hood filters clean", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 143, "ref": "KS-12", "question": "Ventilation systems functioning properly", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 144, "ref": "KS-13", "question": "Fire suppression in hood inspected (current tag)", "criticality": "🔴 CRITICAL — Fire Safety", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 145, "ref": "KS-14", "question": "Grease trap area clean, (Report clogged)", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 146, "ref": "KS-15", "question": "Waste/garbage areas clean, pest-free", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 147, "ref": "KS-16", "question": "Recycling/waste separation followed", "criticality": "🟡 MEDIUM", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 148, "ref": "KS-17", "question": "Dumpster/compactor area safe, accessible", "criticality": "🟡 MEDIUM", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 149, "ref": "KS-18", "question": "Kitchen chemicals labeled", "criticality": "🔴 CRITICAL — HazCom", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 150, "ref": "KS-19", "question": "SDS accessible for all kitchen chemicals", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 151, "ref": "KS-20", "question": "Chemicals stored separately from food", "criticality": "🔴 CRITICAL — Food Safety", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 152, "ref": "KS-21", "question": "Employees trained on kitchen chemical use", "criticality": "🟠 HIGH — Training", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 153, "ref": "KS-22", "question": "Hot surface warning signs posted", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 154, "ref": "KS-23", "question": "Cut-resistant gloves for knives/sharps", "criticality": "🟠 HIGH — PPE", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 155, "ref": "KS-24", "question": "First aid kit accessible in kitchen", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 156, "ref": "KS-25", "question": "Burns treatment supplies available", "criticality": "🟠 HIGH", "shift": "3rd Shift", "section": "Kitchen/Stewarding"}, {"num": 157, "ref": "EV-01", "question": "Floor care equipment in safe condition", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 158, "ref": "EV-02", "question": "Employees trained on floor care machinery", "criticality": "🟠 HIGH — Training", "shift": "2nd Shift", "section": "EVS"}, {"num": 159, "ref": "EV-03", "question": "Equipment electrical cords not frayed/damaged", "criticality": "🔴 CRITICAL — Fire/Shock", "shift": "2nd Shift", "section": "EVS"}, {"num": 160, "ref": "EV-04", "question": "Wet floor signs during floor care", "criticality": "🔴 CRITICAL — #1 Citation", "shift": "2nd Shift", "section": "EVS"}, {"num": 161, "ref": "EV-05", "question": "Floor stripping chemicals: proper PPE + ventilation", "criticality": "🔴 CRITICAL — Chemical", "shift": "2nd Shift", "section": "EVS"}, {"num": 162, "ref": "EV-06", "question": "Equipment stored properly (not blocking exits)", "criticality": "🔴 CRITICAL — Life Safety", "shift": "2nd Shift", "section": "EVS"}, {"num": 163, "ref": "EV-07", "question": "Proper PPE for specialized cleaning", "criticality": "🔴 CRITICAL — PPE", "shift": "2nd Shift", "section": "EVS"}, {"num": 164, "ref": "EV-08", "question": "Pressure washing: safe use with training", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 165, "ref": "EV-09", "question": "Confined space entry procedures (if applicable)", "criticality": "🔴 CRITICAL — Life Safety", "shift": "2nd Shift", "section": "EVS"}, {"num": 166, "ref": "EV-10", "question": "Lockout/tagout for equipment maintenance", "criticality": "🔴 CRITICAL — Top 10 #5", "shift": "2nd Shift", "section": "EVS"}, {"num": 167, "ref": "EV-11", "question": "Laundry equipment guarded, safety devices functional", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 168, "ref": "EV-12", "question": "Laundry equipment training + emergency stops", "criticality": "🟠 HIGH — Training", "shift": "2nd Shift", "section": "EVS"}, {"num": 169, "ref": "EV-13", "question": "Laundry chemical dispensing maintained", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 170, "ref": "EV-14", "question": "Laundry area ventilated, temp controlled", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 171, "ref": "EV-15", "question": "Hot water/steam hazards guarded/signed", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 172, "ref": "EV-16", "question": "Soiled linen sorted with gloves (biohazard)", "criticality": "🔴 CRITICAL — BBP", "shift": "2nd Shift", "section": "EVS"}, {"num": 173, "ref": "EV-17", "question": "Waste areas clean, organized, pest-free", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 174, "ref": "EV-18", "question": "Proper containers for different waste streams", "criticality": "🟡 MEDIUM", "shift": "2nd Shift", "section": "EVS"}, {"num": 175, "ref": "EV-19", "question": "Waste segregation training completed", "criticality": "🟡 MEDIUM", "shift": "2nd Shift", "section": "EVS"}, {"num": 176, "ref": "EV-20", "question": "Hazardous waste disposed per regulations", "criticality": "🔴 CRITICAL — Regulatory", "shift": "2nd Shift", "section": "EVS"}, {"num": 177, "ref": "EV-21", "question": "Equipment inspected, maintenance logged", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 178, "ref": "EV-22", "question": "Storage rooms organized, ventilated", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 179, "ref": "EV-23", "question": "SDS binder accessible in EVS storage", "criticality": "🔴 CRITICAL — #2 Cited", "shift": "2nd Shift", "section": "EVS"}, {"num": 180, "ref": "EV-24", "question": "Mop buckets/tools stored (no trip hazards)", "criticality": "🟠 HIGH", "shift": "2nd Shift", "section": "EVS"}, {"num": 181, "ref": "GC-01", "question": "All operators have valid licenses on file", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 182, "ref": "GC-02", "question": "Golf Cart Use Agreement signed", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 183, "ref": "GC-03", "question": "No operators under age 21", "criticality": "🔴 CRITICAL — Age Req", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 184, "ref": "GC-04", "question": "Only authorized trained employees operate", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 185, "ref": "GC-05", "question": "MVR consent for public road operators", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 186, "ref": "GC-06", "question": "Pre-use inspection before each shift", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 187, "ref": "GC-07", "question": "Battery/fuel level checked", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 188, "ref": "GC-08", "question": "Brakes tested and functioning", "criticality": "🔴 CRITICAL — Safety", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 189, "ref": "GC-09", "question": "Steering, horn, lights, mirrors functioning", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 190, "ref": "GC-10", "question": "Tires/wheels in good condition", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 191, "ref": "GC-11", "question": "Defective carts out of service immediately", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 192, "ref": "GC-12", "question": "Regular maintenance documented", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 193, "ref": "GC-13", "question": "Passengers seated, hands/feet inside", "criticality": "🟠 HIGH", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 194, "ref": "GC-14", "question": "Parked with brake engaged, key removed", "criticality": "🔴 CRITICAL — Safety", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 195, "ref": "GC-15", "question": "No cell phone while operating cart", "criticality": "🔴 CRITICAL", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 196, "ref": "GC-16", "question": "Parked overnight in designated areas", "criticality": "🟡 MEDIUM", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 197, "ref": "GC-17", "question": "Gas carts fueled in open/ventilated areas", "criticality": "🔴 CRITICAL — Fire", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 198, "ref": "GC-18", "question": "Incident reports for all cart accidents", "criticality": "🔴 CRITICAL — Recordkeeping", "shift": "Day Shift", "section": "Golf Carts"}, {"num": 199, "ref": "GC-19", "question": "Cart incidents investigated by Risk Manager", "criticality": "🔴 CRITICAL — Investigation", "shift": "Day Shift", "section": "Golf Carts"}];
-const FALLBACK_LOCATIONS = [{"id": "1005", "name": "Ballys (El Dorado) Shreveport", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Roger Barco", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1055", "name": "Golden Nugget", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Maritzza Odom", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1070", "name": "Sams Town Shreveport", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Zawaunyka Washington", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1072", "name": "Foxwoods Casino", "region": "East", "state": "CT", "rvp": "Anibal Fernandez", "manager": "Farhad Khaledi", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1089", "name": "Wind Creek Casino", "region": "East", "state": "PA", "rvp": "Anibal Fernandez", "manager": "Michelle Santos", "sections": {"Housekeeping": true, "EVS": true, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1092", "name": "Live Casino & Hotel", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Caren Butterworth EVS", "sections": {"Housekeeping": false, "EVS": true, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1092-2", "name": "Live Casino & Hotel", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Robin Zamudio HSK", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1093", "name": "Muckleshoot Casino", "region": "West", "state": "WA", "rvp": "Alan Ching", "manager": "Latoya Jackson", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1100", "name": "Osage Casino Downtown Tulsa", "region": "West", "state": "OK", "rvp": "Alan Ching", "manager": "Joshua Goodhue", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "4011", "name": "Hyatt Regency Greenwich", "region": "East", "state": "CT", "rvp": "Anibal Fernandez", "manager": "Richard Pierre", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4014", "name": "Peabody Memphis", "region": "Central", "state": "TN", "rvp": "Harrison Hutchinson", "manager": "Harrison Hutchinson", "sections": {"Housekeeping": true, "EVS": true, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4023", "name": "Roosevelt New Orleans", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4148", "name": "JW Marriott Austin", "region": "Central", "state": "TX", "rvp": "Harrison Hutchinson", "manager": "", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}, "activeSince": "Q4 2026"}, {"id": "4154", "name": "Legacy Hotel and IMGA Bradenton", "region": "Florida", "state": "FL", "rvp": "Tayquan Taylor", "manager": "Alina Pichs Martinez", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4169", "name": "1 Hotel Hanalei Bay", "region": "West", "state": "HI", "rvp": "Alan Ching", "manager": "Joel Ortiz", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4172", "name": "Sea Island Resort GA", "region": "East", "state": "GA", "rvp": "Anibal Fernandez", "manager": "", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4173", "name": "Great Wolf Lodge", "region": "East", "state": "CT", "rvp": "Anibal Fernandez", "manager": "Kalet Garcia Torres", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4174", "name": "The Oxford Hotel", "region": "West", "state": "CO", "rvp": "Alan Ching", "manager": "Alan Ching", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "4177", "name": "Garden of the Gods", "region": "West", "state": "CO", "rvp": "Alan Ching", "manager": "Alan Ching", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "7022", "name": "Hyatt Regency Pinon Pointe VO", "region": "West", "state": "AZ", "rvp": "Alan Ching", "manager": "Esmeralda Medina Silva", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "7038", "name": "Tucker Century Millenia", "region": "Florida", "state": "FL", "rvp": "Tayquan Taylor", "manager": "Tayquan Taylor", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "9021", "name": "Linq Promenade Las Vegas", "region": "West", "state": "NV", "rvp": "Alan Ching", "manager": "Andy Galan", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "9026", "name": "Southern Hills Hospital", "region": "West", "state": "NV", "rvp": "Alan Ching", "manager": "Martha Maruri", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "9028", "name": "Riverside Hospital", "region": "West", "state": "CA", "rvp": "Alan Ching", "manager": "Alan Ching", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}];
+const FALLBACK_LOCATIONS = [{"id": "1005", "name": "Ballys (El Dorado) Shreveport", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Roger Barco", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1055", "name": "Golden Nugget", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Maritzza Odom", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1070", "name": "Sams Town Shreveport", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Zawaunyka Washington", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1072", "name": "Foxwoods Casino", "region": "East", "state": "CT", "rvp": "Anibal Fernandez", "manager": "Farhad Khaledi", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1089", "name": "Wind Creek Casino", "region": "East", "state": "PA", "rvp": "Anibal Fernandez", "manager": "Michelle Santos", "sections": {"Housekeeping": true, "EVS": true, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1092", "name": "Live Casino & Hotel", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Caren Butterworth EVS", "sections": {"Housekeeping": false, "EVS": true, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1092-2", "name": "Live Casino & Hotel", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "Robin Zamudio HSK", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "1093", "name": "Muckleshoot Casino", "region": "West", "state": "WA", "rvp": "Alan Ching", "manager": "Latoya Jackson", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "1100", "name": "Osage Casino Downtown Tulsa", "region": "West", "state": "OK", "rvp": "Alan Ching", "manager": "Joshua Goodhue", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "4011", "name": "Hyatt Regency Greenwich", "region": "East", "state": "CT", "rvp": "Anibal Fernandez", "manager": "Richard Pierre", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4014", "name": "Peabody Memphis", "region": "Central", "state": "TN", "rvp": "Harrison Hutchinson", "manager": "Harrison Hutchinson", "sections": {"Housekeeping": true, "EVS": true, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4023", "name": "Roosevelt New Orleans", "region": "Central", "state": "LA", "rvp": "Harrison Hutchinson", "manager": "", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4148", "name": "JW Marriott Austin", "region": "Central", "state": "TX", "rvp": "Harrison Hutchinson", "manager": "", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}, "activeSince": "Q4 2026"}, {"id": "4154", "name": "Legacy Hotel and IMGA Bradenton", "region": "Florida", "state": "FL", "rvp": "Tayquan Taylor", "manager": "Alina Pichs Martinez", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4169", "name": "1 Hotel Hanalei Bay", "region": "West", "state": "HI", "rvp": "Alan Ching", "manager": "Joel Ortiz", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4172", "name": "Sea Island Resort GA", "region": "East", "state": "GA", "rvp": "Anibal Fernandez", "manager": "", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4173", "name": "Great Wolf Lodge", "region": "East", "state": "CT", "rvp": "Anibal Fernandez", "manager": "Kalet Garcia Torres", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "4174", "name": "The Oxford Hotel", "region": "West", "state": "CO", "rvp": "Alan Ching", "manager": "Alan Ching", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "4177", "name": "Garden of the Gods", "region": "West", "state": "CO", "rvp": "Alan Ching", "manager": "Alan Ching", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "4184", "name": "Westgate Resort & Spa", "region": "Florida", "state": "FL", "rvp": "Tayquan Taylor", "manager": "", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}, "activeSince": "Q4 2026", "address": ""}, {"id": "7022", "name": "Hyatt Regency Pinon Pointe VO", "region": "West", "state": "AZ", "rvp": "Alan Ching", "manager": "Esmeralda Medina Silva", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "7038", "name": "Tucker Century Millenia", "region": "Florida", "state": "FL", "rvp": "Tayquan Taylor", "manager": "Tayquan Taylor", "sections": {"Housekeeping": true, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "9021", "name": "Linq Promenade Las Vegas", "region": "West", "state": "NV", "rvp": "Alan Ching", "manager": "Andy Galan", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": true, "Kitchen/Stewarding": false, "Vehicles": false, "Golf Carts": false}}, {"id": "9026", "name": "Southern Hills Hospital", "region": "West", "state": "NV", "rvp": "Alan Ching", "manager": "Martha Maruri", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}, {"id": "9028", "name": "Riverside Hospital", "region": "West", "state": "CA", "rvp": "Alan Ching", "manager": "Alan Ching", "sections": {"Housekeeping": false, "EVS": false, "Public Areas": false, "Kitchen/Stewarding": true, "Vehicles": false, "Golf Carts": false}}];
 let LOCATIONS = FALLBACK_LOCATIONS.map(l=>({...l}));
 // Load the shared, admin-managed location list if available, falling back to the
 // bundled copy above if the fetch fails (offline, file not yet uploaded here, etc.)
@@ -612,6 +632,19 @@ let flocs=[...LOCATIONS], hli=-1, inSum=false;
 const STORAGE_KEY='tsc_self_assessment_v1';
 let persistOK=true;
 
+// ── PERSISTENCE: several assessments per device ──
+// A manager, or a director covering several locations, can keep up to MAX_OPEN_AUDITS assessments open
+// on one device, one per location. Each location has its own saved entry holding its current
+// assessment ("cur") and, once the next quarter has been started there, the previous finished one
+// ("prior"), so its Action List can still be updated. Switching locations parks one entry and opens
+// another. Nothing is wiped, and answers can never be carried from one location to another.
+const MAX_OPEN_AUDITS=5;
+const SLOT_PREFIX='tsc_sa_slot_v1:';
+const INDEX_KEY='tsc_sa_index_v1';
+const LEGACY_MIGRATED_KEY='tsc_sa_migrated_v1';
+let auditStarted=false;   // an assessment is open for the selected location
+let viewingPrior=false;   // the previous quarter's Action List is on screen instead of the current assessment
+
 function snapshotState(){
   return {
     selLocId:selLoc?selLoc.id:null,
@@ -625,23 +658,42 @@ function snapshotState(){
     ansOwnerId,
     actionListSentSinceChange,
     initialAuditSent,
+    auditStarted,
     completedBy:document.getElementById('locby')?.value||'',
     quarter:document.getElementById('locqtr')?.value||'',
     auditDate:document.getElementById('locdate')?.value||''
   };
 }
+function readSlot(id){try{const r=localStorage.getItem(SLOT_PREFIX+id);return r?JSON.parse(r):null;}catch(e){return null;}}
+function writeSlot(id,obj){const p=JSON.stringify(obj);localStorage.setItem(SLOT_PREFIX+id,p);return localStorage.getItem(SLOT_PREFIX+id)===p;}
+function removeSlot(id){try{localStorage.removeItem(SLOT_PREFIX+id);}catch(e){}}
+function listSlots(){
+  const out=[];
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);
+    if(k&&k.indexOf(SLOT_PREFIX)===0){const id=k.slice(SLOT_PREFIX.length);const s=readSlot(id);if(s&&(s.cur||s.prior)) out.push({id:id,slot:s});}}}catch(e){}
+  return out;
+}
+function readIndex(){try{const r=localStorage.getItem(INDEX_KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
+function writeIndex(o){try{localStorage.setItem(INDEX_KEY,JSON.stringify(o));}catch(e){}}
+function hasWork(){return auditStarted||finalized||Object.keys(ans).length>0;}
+function openAuditCount(){
+  return listSlots().filter(function(s){return s.slot.cur&&!s.slot.cur.finalized&&(s.slot.cur.auditStarted||Object.keys(s.slot.cur.ans||{}).length>0);}).length;
+}
 function persistState(){
-  const payload=JSON.stringify(snapshotState());
   try{
-    localStorage.setItem(STORAGE_KEY, payload);
-    const readBack=localStorage.getItem(STORAGE_KEY);
-    if(readBack===payload){
-      persistOK=true;
-      showSaveIndicator(true);
-      hideStorageWarning();
-    } else {
-      throw new Error('read-back verification failed');
+    const id=ansOwnerId||(selLoc&&selLoc.id)||null;
+    if(id&&hasWork()){
+      const slot=readSlot(id)||{cur:null,prior:null};
+      const snap=snapshotState();
+      if(viewingPrior) slot.prior=snap; else slot.cur=snap;
+      if(!writeSlot(id,slot)) throw new Error('read-back verification failed');
+      writeIndex({active:id,viewingPrior:viewingPrior});
+    } else if(!hasWork()){
+      writeIndex({active:null,viewingPrior:false});
     }
+    persistOK=true;
+    showSaveIndicator(true);
+    hideStorageWarning();
   }catch(err){
     persistOK=false;
     showSaveIndicator(false);
@@ -649,34 +701,62 @@ function persistState(){
     console.warn('Could not verify saved data in local storage:', err);
   }
 }
-function loadPersistedState(){
+function showChip(){
+  if(!selLoc) return;
+  document.getElementById('lcid').textContent=selLoc.id;
+  document.getElementById('lcname').textContent=selLoc.name;
+  document.getElementById('lcmeta').textContent=selLoc.region+' \u00b7 '+selLoc.state+(selLoc.rvp?' \u00b7 RVP: '+selLoc.rvp:'');
+  document.getElementById('lchip').style.display='flex';
+}
+// Back to an empty working state. Used before a different location is opened, so nothing from one
+// location can ever be carried into another.
+function resetWorking(){
+  Object.keys(ans).forEach(k=>delete ans[k]);
+  Object.keys(notes).forEach(k=>delete notes[k]);
+  Object.keys(nar).forEach(k=>delete nar[k]);
+  Object.keys(naComment).forEach(k=>delete naComment[k]);
+  Object.keys(actionStatus).forEach(k=>delete actionStatus[k]);
+  finalized=false;finalizedOn='';gateReceipt=null;ansOwnerId=null;
+  actionListSentSinceChange=true;initialAuditSent=false;auditStarted=false;viewingPrior=false;
+  sf='All';stf='All';inSum=false;pendingFinalize=false;pendingUnlock=false;
+  document.getElementById('locby').value='';
+  document.getElementById('locdate').value=todayISO();
+}
+function applySnapshot(data){
+  resetWorking();
+  if(data.selLocId) selLoc=LOCATIONS.find(l=>l.id===data.selLocId&&l.name===data.selLocName)||LOCATIONS.find(l=>l.id===data.selLocId)||null;
+  actSec=new Set(data.actSec||CORE);
+  Object.assign(ans,data.ans||{});Object.assign(notes,data.notes||{});Object.assign(nar,data.nar||{});
+  Object.assign(naComment,data.naComment||{});Object.assign(actionStatus,data.actionStatus||{});
+  finalized=!!data.finalized;finalizedOn=data.finalizedOn||'';gateReceipt=data.gateReceipt||null;
+  ansOwnerId=data.ansOwnerId||data.selLocId||null;
+  // Defaults to false (safer) for older saved sessions that predate this flag.
+  actionListSentSinceChange=!!data.actionListSentSinceChange;
+  initialAuditSent=!!data.initialAuditSent;
+  auditStarted=true;
+  document.getElementById('locby').value=data.completedBy||'';
+  ensureQuarterOption(data.quarter||'Q3 2026');
+  document.getElementById('locqtr').value=data.quarter||'Q3 2026';
+  document.getElementById('locdate').value=data.auditDate||todayISO();
+  showChip();
+}
+// Earlier versions kept ONE assessment per device. Move it into its location's entry so nobody loses
+// work in progress when this version loads.
+function migrateLegacyState(){
   try{
+    if(localStorage.getItem(LEGACY_MIGRATED_KEY)) return;
     const raw=localStorage.getItem(STORAGE_KEY);
-    if(!raw)return;
-    const data=JSON.parse(raw);
-    if(!data)return;
-    if(data.selLocId){
-      selLoc=LOCATIONS.find(l=>l.id===data.selLocId && l.name===data.selLocName)||LOCATIONS.find(l=>l.id===data.selLocId)||null;
+    if(raw){
+      const data=JSON.parse(raw);
+      const owner=data&&(data.ansOwnerId||data.selLocId);
+      if(owner&&(Object.keys(data.ans||{}).length>0||data.finalized)){
+        const slot=readSlot(owner)||{cur:null,prior:null};
+        if(!slot.cur){slot.cur=Object.assign({},data,{auditStarted:true,ansOwnerId:owner});writeSlot(owner,slot);writeIndex({active:owner,viewingPrior:false});}
+      }
+      localStorage.removeItem(STORAGE_KEY);
     }
-    if(data.actSec) actSec=new Set(data.actSec);
-    if(data.ans) Object.assign(ans,data.ans);
-    if(data.notes) Object.assign(notes,data.notes);
-    if(data.nar) Object.assign(nar,data.nar);
-    if(data.naComment) Object.assign(naComment,data.naComment);
-    if(data.actionStatus) Object.assign(actionStatus,data.actionStatus);
-    finalized=!!data.finalized;
-    finalizedOn=data.finalizedOn||'';
-    gateReceipt=data.gateReceipt||null;
-    ansOwnerId=data.ansOwnerId||data.selLocId||null;
-    // Defaults to false (safer) for older saved sessions that predate this flag — they'll
-    // just need one Send Audit tap to clear it, same as anyone else with unsent changes.
-    actionListSentSinceChange=!!data.actionListSentSinceChange;
-    initialAuditSent=!!data.initialAuditSent;
-    return data;
-  }catch(err){
-    console.warn('Could not load saved audit:', err);
-    return null;
-  }
+    localStorage.setItem(LEGACY_MIGRATED_KEY,'1');
+  }catch(err){console.warn('Could not move the earlier saved audit:',err);}
 }
 function checkStorageHealthOnLoad(){
   try{
@@ -734,23 +814,30 @@ function handleKey(e){
 document.addEventListener('click',e=>{if(!document.getElementById('lsw').contains(e.target))closeDD();});
 
 function pickLoc(i){
-  selLoc=flocs[i];
+  const next=flocs[i]; if(!next) return;
+  // Park whatever is open first. Switching locations never loses work and never mixes two locations.
+  if(hasWork()) persistState();
+  resetWorking();
+  selLoc=next;
   document.getElementById('ls').value='';
   closeDD();
-  document.getElementById('lcid').textContent=selLoc.id;
-  document.getElementById('lcname').textContent=selLoc.name;
-  document.getElementById('lcmeta').textContent=selLoc.region+' \u00b7 '+selLoc.state+(selLoc.rvp?' \u00b7 RVP: '+selLoc.rvp:'');
-  document.getElementById('lchip').style.display='flex';
-  document.getElementById('deleteSavedBtn').style.display=Object.keys(ans).length>0?'':'none';
-  updateNewAuditBlockAppearance();
+  showChip();
   actSec=new Set(CORE);
   OPT.forEach(s=>{if(selLoc.sections[s])actSec.add(s);});
-  renderSetup();updateStartBtn();
-  // Resuming work already on this device skips the check; anything new goes through it.
-  if(Object.keys(ans).length>0 && ansOwnerId===selLoc.id){ gateToken++; gateState=null; renderGateCard(); unlockQuarter(); updateStartBtn(); }
-  else runGate();
+  const slot=readSlot(selLoc.id);
+  if(slot&&slot.cur&&!slot.cur.finalized){
+    // Work in progress here: pick it up exactly where it was left, no eligibility check needed.
+    applySnapshot(slot.cur);
+    gateToken++; gateState=null; renderGateCard(); unlockQuarter();
+    renderSetup();renderMyAudits();updateStartBtn();
+    return;
+  }
+  renderSetup();renderMyAudits();updateStartBtn();
+  runGate();   // a new assessment (or the next quarter): the normal eligibility check
 }
 function clearLoc(){
+  if(hasWork()) persistState();   // park it, never wipe it
+  resetWorking();
   gateToken++; gateState=null; renderGateCard(); unlockQuarter();
   selLoc=null;
   document.getElementById('lchip').style.display='none';
@@ -758,78 +845,84 @@ function clearLoc(){
   document.getElementById('ls').focus();
   flocs=[...LOCATIONS];
   actSec=new Set(CORE);
-  renderSetup();updateStartBtn();
+  renderSetup();renderMyAudits();updateStartBtn();
 }
-let pendingDeleteSaved=false;
-let deleteSavedResetTimer=null;
-// Shared visual state for both New Audit and Delete Saved — greyed out proactively
-// whenever they'd actually be blocked, rather than only revealing this after a tap.
-// Called anywhere actionStatus or actionListSentSinceChange can change.
-function isNewAuditBlocked(){
-  const openCount=Object.values(actionStatus).filter(a=>a.status==='Open').length;
-  return openCount>0 && !actionListSentSinceChange;
+// Kept as a no-op: the old lock on New Audit / Delete no longer exists, but this is still called from
+// several places that change an Action List item.
+function updateNewAuditBlockAppearance(){}
+
+// Open a saved assessment for a location: resume one in progress, or look at a finished one.
+function openSaved(which){
+  const id=selLoc&&selLoc.id; if(!id) return;
+  const slot=readSlot(id); const snap=slot&&slot[which]; if(!snap) return;
+  if(hasWork()) persistState();
+  applySnapshot(snap);
+  viewingPrior=(which==='prior');
+  gateToken++; gateState=null; unlockQuarter();
+  if(finalized){ if(!finalizedOn) finalizedOn=snap.auditDate||todayISO(); syncHistory(); }
+  enterAudit();
+  if(finalized&&document.getElementById('actionListPane').style.display!=='block') toggleActionList();
 }
-function updateNewAuditBlockAppearance(){
-  const blocked=isNewAuditBlocked();
-  const newBtn=document.getElementById('newbtn');
-  if(newBtn && !pendingNewAudit){
-    if(blocked){
-      newBtn.textContent='🔒 New Audit';
-      newBtn.style.background='#94a3b8';
-      newBtn.style.cursor='not-allowed';
-      newBtn.title='Send your Action List update first — tap for details';
-    } else {
-      newBtn.textContent='🔄 New Audit';
-      newBtn.style.background='';
-      newBtn.style.cursor='';
-      newBtn.title='';
-    }
-  }
-  const delBtn=document.getElementById('deleteSavedBtn');
-  if(delBtn && !pendingDeleteSaved && delBtn.style.display!=='none'){
-    if(blocked){
-      delBtn.textContent='🔒 Delete Saved';
-      delBtn.style.background='#94a3b8';
-      delBtn.style.color='#1e293b';
-      delBtn.style.cursor='not-allowed';
-      delBtn.title='Send your Action List update first — tap for details';
-    } else {
-      delBtn.textContent='🗑️ Delete Saved';
-      delBtn.style.background='#fee2e2';
-      delBtn.style.color='#b91c1c';
-      delBtn.style.cursor='';
-      delBtn.title='';
-    }
-  }
+function resumeSlot(id){
+  flocs=[...LOCATIONS];
+  const i=flocs.findIndex(l=>l.id===id);
+  if(i<0){ alert('This location is no longer in the self-assessment program, so it can only be deleted from this list.'); return; }
+  pickLoc(i);
+  const s=readSlot(id);
+  if(s&&s.cur&&!s.cur.finalized) startAudit(); else openSaved(s&&s.cur?'cur':'prior');
 }
-function requestDeleteSaved(){
-  const btn=document.getElementById('deleteSavedBtn');
-  // Same hard block as requestNewAudit — this is a second path to the same wipe, so it
-  // needs the same protection or a manager could bypass the block via this button instead.
-  const openCount=Object.values(actionStatus).filter(a=>a.status==='Open').length;
-  if(openCount>0 && !actionListSentSinceChange){
-    alert('⚠️ You have '+openCount+' Open action item'+(openCount===1?'':'s')+' that hasn\'t been sent yet.\n\nRe-enter this audit and tap "📋 Send Action List" (or "✉️ Send Audit" if you haven\'t submitted at all yet) to email your latest update first. Once that\'s sent, deleting will be available.\n\n("In Progress" items don\'t block this — only ones still marked Open.)');
-    return;
-  }
-  const wipeMsg=wipeBlockedMessage();
-  if(wipeMsg){ alert(wipeMsg); return; }
-  if(!pendingDeleteSaved){
-    const n=Object.keys(ans).length;
-    pendingDeleteSaved=true;
-    btn.textContent='⚠️ Tap again — '+n+' lost';
-    clearTimeout(deleteSavedResetTimer);
-    deleteSavedResetTimer=setTimeout(()=>{
-      if(pendingDeleteSaved){
-        pendingDeleteSaved=false;
-        btn.textContent='🗑️ Delete Saved';
+function unresolvedIn(snap){return Object.values((snap&&snap.actionStatus)||{}).filter(function(a){return a.status!=='Resolved';}).length;}
+function renderMyAudits(){
+  const el=document.getElementById('myAudits');
+  const del=document.getElementById('deleteSavedBtn');
+  if(del) del.style.display=(selLoc&&readSlot(selLoc.id))?'':'none';
+  if(!el) return;
+  const slots=listSlots();
+  if(!slots.length){el.style.display='none';el.innerHTML='';return;}
+  slots.sort(function(a,b){const an=(LOCATIONS.find(l=>l.id===a.id)||{name:a.id}).name,bn=(LOCATIONS.find(l=>l.id===b.id)||{name:b.id}).name;return an<bn?-1:1;});
+  const open=openAuditCount();
+  el.style.display='';
+  el.innerHTML='<div class="scard"><h2>📂 On this device</h2>'
+    +'<div class="sub">'+open+' of '+MAX_OPEN_AUDITS+' open · one assessment per location. Tap a location to pick up where you left off. Nothing here is lost when you switch.</div>'
+    +slots.map(function(s){
+      const loc=LOCATIONS.find(l=>l.id===s.id);
+      const name=loc?loc.name:((s.slot.cur||s.slot.prior).selLocName||s.id)+' (no longer in the program)';
+      const cur=s.slot.cur, prior=s.slot.prior; let line='',btn='';
+      if(cur&&!cur.finalized){
+        const tot=(cur.actSec||[]).reduce(function(n,k){return n+(SQCOUNT[k]||0);},0);
+        line=xH(cur.quarter)+' · in progress · '+Object.keys(cur.ans||{}).length+' of '+tot+' answered';
+        btn='<button class="ma-btn ma-resume" onclick="resumeSlot(\''+xH(s.id)+'\')">Resume</button>';
+      } else if(cur){
+        const n=unresolvedIn(cur);
+        line=xH(cur.quarter)+' · finalized'+(cur.finalizedOn?' '+xH(fmtDay(cur.finalizedOn)):'')+(n?' · '+n+' action item'+(n===1?'':'s')+' not resolved':' · all action items resolved');
+        btn='<button class="ma-btn ma-resume" onclick="resumeSlot(\''+xH(s.id)+'\')">Open</button>';
+      } else if(prior){
+        line=xH(prior.quarter)+' Action List only';
+        btn='<button class="ma-btn ma-resume" onclick="resumeSlot(\''+xH(s.id)+'\')">Open</button>';
       }
-    },4000);
-    return;
-  }
-  clearTimeout(deleteSavedResetTimer);
-  pendingDeleteSaved=false;
-  newAudit();
-  document.getElementById('deleteSavedBtn').style.display='none';
+      if(cur&&prior&&unresolvedIn(prior)) line+=' · '+unresolvedIn(prior)+' from '+xH(prior.quarter)+' still open';
+      return '<div class="ma-row"><div class="ma-main"><div class="ma-name">'+xH(name)+'</div><div class="ma-sub">'+line+'</div></div>'
+        +btn+'<button class="ma-btn ma-del" onclick="deleteSlotPrompt(\''+xH(s.id)+'\')">Delete</button></div>';
+    }).join('')+'</div>';
+}
+function deleteSlotPrompt(id){
+  if(!id) return;
+  const slot=readSlot(id); if(!slot) return;
+  const loc=LOCATIONS.find(l=>l.id===id); const cur=slot.cur, prior=slot.prior;
+  const name=loc?loc.name:(((cur||prior)||{}).selLocName||id);
+  let msg='Delete the saved assessment for '+name+'?\n\n';
+  if(cur) msg+=(cur.finalized?'Finalized ':'In progress ')+cur.quarter+': '+Object.keys(cur.ans||{}).length+' answers and its Action List will be removed from this device.\n';
+  if(prior) msg+='The saved '+prior.quarter+' Action List will be removed too.\n';
+  // Deleting is the one thing that can still lose findings the Risk VP hasn't received, so say so. It is a
+  // warning, never a block.
+  const unsent=cur?Object.values(cur.actionStatus||{}).filter(function(a){return a.status==='Open';}).length:0;
+  if(cur&&cur.finalized&&!cur.initialAuditSent) msg+='\n⚠️ This finalized assessment has not been sent to your Regional VP and Risk VP yet. Tap Excel, then Send Audit, first if they still need it.\n';
+  else if(cur&&unsent&&!cur.actionListSentSinceChange) msg+='\n⚠️ '+unsent+' Open action item'+(unsent===1?' has':'s have')+' not been sent yet. Send your Action List first if you still need them.\n';
+  msg+='\nThis cannot be undone. Tap Excel first if you might need a copy.';
+  if(!confirm(msg)) return;
+  removeSlot(id);
+  const idx=readIndex(); if(idx&&idx.active===id) writeIndex({active:null,viewingPrior:false});
+  if(selLoc&&selLoc.id===id){ resetWorking(); clearLoc(); } else { renderMyAudits(); updateStartBtn(); }
 }
 
 // ── SETUP TOGGLES ──
@@ -844,13 +937,20 @@ function renderSetup(){
       +'</div>';
   }).join('');
 }
-function toggleSS(s){actSec.has(s)?actSec.delete(s):actSec.add(s);renderSetup();updateStartBtn();}
+function toggleSS(s){actSec.has(s)?actSec.delete(s):actSec.add(s);renderSetup();updateStartBtn();if(hasWork())persistState();}
 function updateStartBtn(){
   const btn=document.getElementById('startbtn');
   if(selLoc){
+    const q=document.getElementById('locqtr').value;
+    const tot=[...actSec].reduce((s,k)=>s+(SQCOUNT[k]||0),0);
+    if(auditStarted&&ansOwnerId===selLoc.id&&!viewingPrior){
+      btn.disabled=false;
+      btn.textContent=(finalized?'Open ':'Resume ')+q+' Self-Assessment \u2014 '+Object.keys(ans).length+' of '+tot+' answered \u2192';
+      return;
+    }
     if(gateState&&gateState.checking){btn.disabled=true;btn.textContent='Checking your records\u2026';return;}
     if(gateState&&gateState.blocked){btn.disabled=true;btn.textContent='Not available yet \u2014 see the message above';return;}
-    const tot=[...actSec].reduce((s,k)=>s+(SQCOUNT[k]||0),0);
+    if(openAuditCount()>=MAX_OPEN_AUDITS){btn.disabled=true;btn.textContent=MAX_OPEN_AUDITS+' assessments are already open on this device \u2014 finish or delete one first';return;}
     btn.disabled=false;
     const label=(gateState&&gateState.target)?('Start '+gateState.target+(gateState.late?' (late)':'')+' Self-Assessment'):'Start Audit';
     btn.textContent=label+' \u2014 '+tot+' questions \u2192';
@@ -861,7 +961,9 @@ function updateStartBtn(){
 // Three rules decide whether a location can open its next self-assessment:
 //   1. Quarters are completed in order — Q4 can't open until Q3 is done.
 //   2. At least MIN_DAYS_BETWEEN days between one finalized assessment and the next.
-//   3. Critical/High action items past their due date must be Resolved first.
+// Critical/High action items past their due date are shown as a reminder. They do NOT hold up the next
+// assessment (a decision made at the Q3 to Q4 changeover, so people can keep moving while the action
+// list catches up). They are still tracked on the Tracker and Dashboard.
 // This page is static, so it's guidance rather than a lock a determined person couldn't
 // get around — which is why every export also carries a "gate receipt" that the Tracking
 // Dashboard checks when the file is loaded.
@@ -1023,7 +1125,7 @@ function evaluateGate(loc,recs,today,ov){
   g.openItems=[...items.values()]
     .filter(function(a){return !a.resolved&&(a.level==='CRITICAL'||a.level==='HIGH');})
     .sort(function(a,b){return (a.dueDate||'9999')<(b.dueDate||'9999')?-1:1;});
-  if(!waive.has('actions')) g.overdue=g.openItems.filter(function(a){return a.dueDate&&a.dueDate<today;});
+  g.overdue=g.openItems.filter(function(a){return a.dueDate&&a.dueDate<today;});   // shown as a reminder only
 
   if(g.target){
     const cutoff=quarterCutoffISO(g.target);
@@ -1038,35 +1140,8 @@ function evaluateGate(loc,recs,today,ov){
     const nq=qStartISO(qNext(curQ));
     g.nextOpens=(g.eligibleOn&&g.eligibleOn>nq)?g.eligibleOn:nq;
   }
-  g.blocked=g.tooSoon||g.overdue.length>0||g.alreadyComplete||!!g.orderGap;
+  g.blocked=g.tooSoon||g.alreadyComplete||!!g.orderGap;
   return g;
-}
-
-// Plain-text version of the same decision — used by the New Audit / Delete Saved guards.
-function gateSummaryText(g,loc){
-  const L=loc?loc.name:'this location';
-  const lines=[];
-  if(g.orderGap){
-    lines.push(g.orderGap+' is on file for '+L+' but '+g.target+' is not. Your Risk VP needs to confirm which quarter that assessment belongs to.');
-  } else if(g.alreadyComplete){
-    lines.push(g.curQ+' is already complete for '+L+'. The next assessment opens on '+fmtDay(g.nextOpens,true)+'.');
-  } else if(g.tooSoon){
-    lines.push('At least '+MIN_DAYS_BETWEEN+' days are required between assessments. Your last one ('+g.lastQuarter+') was finalized '+fmtDay(g.lastFinal)+', so the next can be started on '+fmtDay(g.eligibleOn,true)+'.');
-  }
-  if(g.overdue.length) lines.push(g.overdue.length+' Critical/High action item'+(g.overdue.length===1?' is':'s are')+' past due and must be marked Resolved first.');
-  return lines.join('\n\n');
-}
-function wipeBlockedMessage(){
-  // New Audit / Delete Saved wipe this device's Action List. While the next assessment
-  // can't open yet, that list is the only place the manager can resolve their items — so
-  // refuse the wipe rather than strand them with no way to clear the gate later.
-  if(!finalized) return '';
-  const owner=LOCATIONS.find(function(l){return l.id===ansOwnerId;})||selLoc;
-  if(!owner) return '';
-  const today=todayISO();
-  const g=evaluateGate(owner,recordsForLocation(owner.id),today,activeOverride(owner.id,today));
-  if(!g.blocked) return '';
-  return '🔒 You can\'t start a new assessment yet — and clearing this one now would delete the Action List you still need.\n\n'+gateSummaryText(g,owner)+'\n\nYour Action List stays on this device until then.';
 }
 
 // ── local history (so the check works offline and reflects updates immediately) ──
@@ -1156,7 +1231,7 @@ function renderGateCard(){
     cls='info';title='✅ '+xH(g.curQ)+' is already complete';
     body='<p>'+L+' has completed its '+xH(g.curQ)+' self-assessment. The next one opens on <strong>'+fmtDay(g.nextOpens,true)+'</strong>'
       +(g.eligibleOn&&g.nextOpens===g.eligibleOn?' (45 days after your last one on '+fmtDay(g.lastFinal)+').':'.')+'</p>';
-    if(g.overdue.length) body+='<p><strong>Recommended:</strong> '+g.overdue.length+' Critical/High item'+(g.overdue.length===1?' is':'s are')+' past due — they must be Resolved before that date.</p>'+gateItemsHtml(g.overdue,today,8)+alHelp();
+    if(g.overdue.length) body+='<p><strong>Reminder:</strong> '+g.overdue.length+' Critical/High item'+(g.overdue.length===1?' is':'s are')+' past due. They won\'t hold up your next assessment, but please keep updating them.</p>'+gateItemsHtml(g.overdue,today,8)+alHelp();
   } else if(g.orderGap){
     cls='warn';title='🧭 '+xH(g.orderGap)+' is on file for '+L+', but '+xH(g.target)+' is not';
     body='<p>An assessment'+(g.orderGapDate?' dated <strong>'+fmtDay(g.orderGapDate)+'</strong>':'')+' is filed under <strong>'+xH(g.orderGap)+'</strong>, but <strong>'+xH(g.target)+'</strong> has not been submitted. Quarters are completed in order, so this looks like a '+xH(g.target)+' assessment filed under the wrong quarter.</p>'
@@ -1166,17 +1241,13 @@ function renderGateCard(){
     body='<p>Your last assessment (<strong>'+xH(g.lastQuarter)+'</strong>) was finalized on <strong>'+fmtDay(g.lastFinal)+'</strong>'+(g.lastApprox?' (based on the audit date on file)':'')
       +'. At least <strong>'+MIN_DAYS_BETWEEN+' days</strong> are required between assessments, so you can submit on <strong>'+fmtDay(g.eligibleOn,true)+'</strong> — '+g.daysLeft+' day'+(g.daysLeft===1?'':'s')+' from now.</p>';
     if(g.openItems.length){
-      body+='<p><strong>Recommended:</strong> use these '+g.daysLeft+' days to close out your action plan so you\'re ready to go that day. '
-        +(g.overdue.length?'<strong>'+g.overdue.length+' Critical/High item'+(g.overdue.length===1?' is':'s are')+' already past due</strong> and must be Resolved before the assessment will open — even after '+fmtDay(g.eligibleOn)+'.':'These must be Resolved by their due dates to keep the next assessment open.')+'</p>'
+      body+='<p><strong>Recommended:</strong> use these '+g.daysLeft+' days to keep closing out your action plan. '
+        +(g.overdue.length?'<strong>'+g.overdue.length+' Critical/High item'+(g.overdue.length===1?' is':'s are')+' past due.</strong> That does not hold up your next assessment. The only wait is the '+MIN_DAYS_BETWEEN+' days.':'Updating them early keeps your action list current.')+'</p>'
         +gateItemsHtml(g.openItems,today,8)+alHelp();
     } else {
       body+='<p><strong>Recommended:</strong> nothing to clear — you have no open Critical/High action items. Just come back on '+fmtDay(g.eligibleOn,true)+'.</p>';
     }
     if(g.willBeLate) body+='<p class="gate-meta">Heads up: that date is after '+xH(g.target)+' closed ('+fmtDay(quarterCutoffISO(g.target))+'), so it will be recorded as a late submission.</p>';
-  } else if(g.overdue.length){
-    cls='block';title='📋 Action items are past due';
-    body='<p>Critical and High items must be <strong>Resolved</strong> before your next assessment can open. <strong>'+g.overdue.length+'</strong> item'+(g.overdue.length===1?' is':'s are')+' past '+(g.overdue.length===1?'its':'their')+' due date:</p>'
-      +gateItemsHtml(g.overdue,today,10)+alHelp();
   } else if(g.redirected){
     cls='warn';title='📌 '+xH(g.target)+' comes first';
     body='<p>'+xH(g.target)+' hasn\'t been submitted for '+L+'. Quarters are completed in order, so <strong>'+xH(g.target)+' has to be finished before '+xH(qNext(g.target))+' can open</strong>.</p>'
@@ -1195,10 +1266,16 @@ function renderGateCard(){
     cls='ok';title='✅ You\'re clear to start '+xH(g.target);
     body='<p>Your quarter has been set to <strong>'+xH(g.target)+'</strong>.</p>';
   }
+  if(g.overdue.length&&!g.tooSoon&&!g.alreadyComplete&&!g.orderGap){
+    body+='<p><strong>Reminder:</strong> '+g.overdue.length+' Critical/High action item'+(g.overdue.length===1?' is':'s are')+' past due from your earlier assessment. This does <strong>not</strong> hold up '+xH(g.target)+'. Please keep updating them in your Action List and send the update.</p>'+gateItemsHtml(g.overdue,today,8)+alHelp();
+  }
   if(g.override) body+='<p class="gate-meta">🛈 An exception is on file for this location'+(g.override.note?': '+xH(g.override.note):'')+'.</p>';
   if(g.unverified) body+='<p class="gate-meta">⚠️ Couldn\'t reach the published records, so this check used only what\'s saved on this device. Your Risk VP will confirm eligibility when your file arrives.</p>';
 
-  const btns='<button class="gate-btn alt" onclick="runGate()">🔄 Check again</button>';
+  let btns='<button class="gate-btn alt" onclick="runGate()">🔄 Check again</button>';
+  const sv=readSlot(selLoc.id);
+  if(sv&&sv.cur&&sv.cur.finalized) btns='<button class="gate-btn" onclick="openSaved(\'cur\')">📋 Open my '+xH(sv.cur.quarter)+' assessment &amp; Action List</button>'+btns;
+  else if(sv&&!sv.cur&&sv.prior) btns='<button class="gate-btn" onclick="openSaved(\'prior\')">📋 Open my '+xH(sv.prior.quarter)+' Action List</button>'+btns;
   el.className='gate '+cls;
   el.innerHTML='<h2>'+title+'</h2>'+body
     +'<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+btns+'</div>'
@@ -1236,15 +1313,36 @@ function requestSendActionList(){
   openEmailModal('actionlist');
 }
 function startAudit(){
+  if(!selLoc) return;
+  // Already open for this location: just go back into it.
+  if(auditStarted&&ansOwnerId===selLoc.id&&!viewingPrior){ enterAudit(); return; }
   if(gateState && (gateState.checking||gateState.blocked)) return;
-  ansOwnerId=selLoc?selLoc.id:ansOwnerId;
+  if(openAuditCount()>=MAX_OPEN_AUDITS){
+    alert('You already have '+MAX_OPEN_AUDITS+' assessments open on this device.\n\nFinish one, or delete one from the "On this device" list, before starting another.');
+    return;
+  }
+  // The next quarter is starting here: last quarter's finished assessment becomes "previous" and stays
+  // reachable, so its Action List can still be updated.
+  const slot=readSlot(selLoc.id);
+  if(slot&&slot.cur){ slot.prior=slot.cur; slot.cur=null; writeSlot(selLoc.id,slot); }
+  ansOwnerId=selLoc.id;
+  auditStarted=true; viewingPrior=false;
+  enterAudit();
+}
+function showSetupScreen(){
+  document.getElementById('setup-screen').style.display='';
+  document.getElementById('audit-screen').style.display='none';
+  ['pbadge','savebtn','sumbtn','albtn','expbtn','emailbtn','finalizebtn','newbtn','hloc','progress-wrap'].forEach(id=>{
+    document.getElementById(id).style.display='none';
+  });
+}
+function enterAudit(){
   document.getElementById('setup-screen').style.display='none';
   document.getElementById('audit-screen').style.display='block';
   ['pbadge','savebtn','sumbtn','albtn','expbtn','emailbtn','finalizebtn','newbtn','hloc','progress-wrap'].forEach(id=>{
     document.getElementById(id).style.display='';
   });
   updateSendActionListBtnVisibility();
-  updateNewAuditBlockAppearance();
   updateSendActionListBlockAppearance();
   document.getElementById('hloctext').innerHTML=
     '<span style="background:#1e3a8a;color:#bfdbfe;padding:1px 7px;border-radius:4px;font-weight:700;font-size:11px;margin-right:5px">'+xH(selLoc.id)+'</span>'
@@ -1253,75 +1351,45 @@ function startAudit(){
   inSum=false;
   updateFinalizedUI();
   buildChips();renderSecMgmt();render();
+  updatePriorBanner();
   persistState();
 }
 function backToSetup(){
-  document.getElementById('setup-screen').style.display='';
-  document.getElementById('audit-screen').style.display='none';
-  ['pbadge','savebtn','sumbtn','albtn','expbtn','emailbtn','finalizebtn','newbtn','hloc','progress-wrap'].forEach(id=>{
-    document.getElementById(id).style.display='none';
-  });
-  document.getElementById('deleteSavedBtn').style.display=Object.keys(ans).length>0?'':'none';
-  updateNewAuditBlockAppearance();
-  updateStartBtn();
-}
-let pendingNewAudit=false;
-let newAuditResetTimer=null;
-function requestNewAudit(){
-  const btn=document.getElementById('newbtn');
-  // Hard block: refuse to even arm the delete/reset flow if there are still "Open" action
-  // items that haven't been sent since their last change. "In Progress" items don't block —
-  // those can legitimately carry into next quarter. This exists specifically to prevent a
-  // manager from accidentally wiping unresolved, unsent findings.
-  const openCount=Object.values(actionStatus).filter(a=>a.status==='Open').length;
-  if(openCount>0 && !actionListSentSinceChange){
-    alert('⚠️ You have '+openCount+' Open action item'+(openCount===1?'':'s')+' that hasn\'t been sent yet.\n\nTap "📋 Send Action List" (or "✉️ Send Audit" if you haven\'t submitted at all yet) to email your latest update to your Regional VP and Risk VP first. Once that\'s sent, New Audit will be available.\n\n("In Progress" items don\'t block this — only ones still marked Open.)');
-    return;
+  const id=selLoc?selLoc.id:null;
+  if(hasWork()) persistState();
+  showSetupScreen();
+  if(id){
+    flocs=[...LOCATIONS];
+    const i=flocs.findIndex(l=>l.id===id);
+    if(i>=0){ pickLoc(i); return; }
   }
-  const wipeMsg=wipeBlockedMessage();
-  if(wipeMsg){ alert(wipeMsg); return; }
-  if(!pendingNewAudit){
-    const n=Object.keys(ans).length;
-    pendingNewAudit=true;
-    if(btn){
-      btn.textContent=n>0 ? '⚠️ Tap again — '+n+' lost' : '⚠️ Tap again';
-      btn.style.background='#dc2626';
-    }
-    // Auto-reset after a few seconds so it doesn't stay armed indefinitely if the
-    // manager gets distracted — same safety behavior as the Tracking Dashboard's
-    // "Clear All Loaded" button.
-    clearTimeout(newAuditResetTimer);
-    newAuditResetTimer=setTimeout(()=>{
-      if(pendingNewAudit){
-        pendingNewAudit=false;
-        if(btn){ btn.textContent='🔄 New Audit'; btn.style.background=''; }
-      }
-    },4000);
-    return;
-  }
-  clearTimeout(newAuditResetTimer);
-  pendingNewAudit=false;
-  if(btn){ btn.textContent='🔄 New Audit'; btn.style.background=''; }
-  newAudit();
+  renderMyAudits();updateStartBtn();
 }
-function newAudit(){
-  Object.keys(ans).forEach(k=>delete ans[k]);
-  Object.keys(notes).forEach(k=>delete notes[k]);
-  Object.keys(nar).forEach(k=>delete nar[k]);
-  Object.keys(naComment).forEach(k=>delete naComment[k]);
-  Object.keys(actionStatus).forEach(k=>delete actionStatus[k]);
-  finalized=false;
-  finalizedOn='';gateReceipt=null;ansOwnerId=null;
-  actionListSentSinceChange=true; // nothing left to send after a genuine fresh start
-  sf='All';stf='All';inSum=false;
-  document.getElementById('locdate').value=new Date().toISOString().slice(0,10);
-  document.getElementById('locby').value='';
-  backToSetup();
-  // Fully clear the location too — otherwise a manager who wanted a genuinely fresh
-  // start lands back on setup with the exact same location still selected, which looks
-  // like nothing happened, especially when there were no answers to visibly lose.
+// "📂 My Audits": back to the list of everything saved on this device, with nothing selected.
+function openMyAudits(){
+  if(hasWork()) persistState();
+  showSetupScreen();
   clearLoc();
-  persistState();
+}
+function updatePriorBanner(){
+  const el=document.getElementById('priorBanner'); if(!el) return;
+  const slot=selLoc?readSlot(selLoc.id):null;
+  if(viewingPrior){
+    const back=slot&&slot.cur?('Back to '+xH(slot.cur.quarter)):'Back';
+    el.style.display='';
+    el.innerHTML='📂 You are looking at your <strong>previous quarter ('+xH(document.getElementById('locqtr').value)+')</strong>. Updates you make here still count. <button onclick="closePrior()">← '+back+'</button>';
+  } else if(slot&&slot.prior&&unresolvedIn(slot.prior)>0){
+    const n=unresolvedIn(slot.prior);
+    el.style.display='';
+    el.innerHTML='📌 <strong>'+n+' action item'+(n===1?'':'s')+' from '+xH(slot.prior.quarter)+'</strong> '+(n===1?'is':'are')+' still open. They don\'t hold anything up, but please keep updating them. <button onclick="openSaved(\'prior\')">Open '+xH(slot.prior.quarter)+' Action List</button>';
+  } else { el.style.display='none'; el.innerHTML=''; }
+}
+function closePrior(){
+  const id=selLoc&&selLoc.id; if(!id) return;
+  persistState();   // keeps what was changed on the previous quarter's list
+  const slot=readSlot(id); const cur=slot&&slot.cur;
+  viewingPrior=false;
+  if(cur){ applySnapshot(cur); enterAudit(); } else { openMyAudits(); }
 }
 
 // ── SEC MGMT ──
@@ -1550,7 +1618,7 @@ function updateFinalizedUI(){
     banner.textContent='\ud83d\udd12 This audit is finalized \u2014 answers are locked. Use the Action List to track remediation.';
     finalizeBtn.style.display='none';
     if(unlockBtn){
-      unlockBtn.style.display='';
+      unlockBtn.style.display=viewingPrior?'none':'';
       unlockBtn.textContent=pendingUnlock?'\u26a0\ufe0f Tap to confirm unlock':'\ud83d\udd13 Unlock to Fix a Mistake';
       unlockBtn.style.background=pendingUnlock?'#dc2626':'#64748b';
       unlockBtn.onclick=pendingUnlock?confirmUnlock:requestUnlock;
@@ -2074,24 +2142,28 @@ window.addEventListener('offline', updateNetStatusBadge);
 // init
 checkStorageHealthOnLoad();
 updateNetStatusBadge();
-document.getElementById('locdate').value=new Date().toISOString().slice(0,10);
-const _restored=loadPersistedState();
+document.getElementById('locdate').value=todayISO();
+migrateLegacyState();
 renderSetup();
-if(_restored && selLoc){
-  document.getElementById('locby').value=_restored.completedBy||'';
-  ensureQuarterOption(_restored.quarter||'Q3 2026');
-  document.getElementById('locqtr').value=_restored.quarter||'Q3 2026';
-  document.getElementById('locdate').value=_restored.auditDate||new Date().toISOString().slice(0,10);
-  document.getElementById('lcid').textContent=selLoc.id;
-  document.getElementById('lcname').textContent=selLoc.name;
-  document.getElementById('lcmeta').textContent=selLoc.region+' \u00b7 '+selLoc.state+(selLoc.rvp?' \u00b7 RVP: '+selLoc.rvp:'');
-  document.getElementById('lchip').style.display='flex';
-  ansOwnerId=_restored.ansOwnerId||selLoc.id;
-  // Sessions finalized before this version have no finalize date — fall back to the audit
-  // date so this device's history (and the 45-day clock) still reflects them.
-  if(finalized){ if(!finalizedOn) finalizedOn=_restored.auditDate||todayISO(); syncHistory(); }
-  startAudit();
-}
+(function restoreWhereTheyWere(){
+  const idx=readIndex(); if(!idx||!idx.active) return;
+  const slot=readSlot(idx.active); if(!slot) return;
+  const snap=(idx.viewingPrior&&slot.prior)?slot.prior:slot.cur; if(!snap) return;
+  applySnapshot(snap);
+  if(!selLoc){ resetWorking(); return; }   // the location has since left the program
+  viewingPrior=!!(idx.viewingPrior&&slot.prior);
+  // Sessions finalized before this version have no finalize date: fall back to the audit date so the
+  // 45-day clock still reflects them.
+  if(finalized){ if(!finalizedOn) finalizedOn=snap.auditDate||todayISO(); syncHistory(); }
+  enterAudit();
+})();
+renderMyAudits();
+updateStartBtn();
+// Changes to Completed By / date / quarter on the setup screen are saved as they are made.
+['locby','locdate','locqtr'].forEach(function(id){
+  const el=document.getElementById(id); if(!el) return;
+  ['input','change'].forEach(function(ev){el.addEventListener(ev,function(){ if(hasWork()) persistState(); });});
+});
 </script>
 </body>
 </html>
